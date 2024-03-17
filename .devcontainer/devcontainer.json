@@ -1,0 +1,39 @@
+{
+  "name": "next dev container",
+  "dockerComposeFile": ["../docker-compose.yml"],
+  "service": "app",
+  // 開いたコンテナ内のワークスペースのパス
+  "workspaceFolder": "/var/www",
+  // コンテナ内のユーザー名
+  "remoteUser": "root",
+  // devコンテナを閉じた時のアクション
+  "shutdownAction": "stopCompose",
+  // リモート先のVS Codeにインストールする拡張機能
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": true
+        },
+        "eslint.format.enable": false,
+        "editor.formatOnSave": true,
+        "editor.tabSize": 2,
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+      },
+      "extensions": [
+        "esbenp.prettier-vscode",
+        "mhutchie.git-graph",
+        "formulahendry.auto-close-tag",
+        "formulahendry.auto-rename-tag",
+        "mikestead.dotenv",
+        "github.copilot-chat",
+        "github.copilot-labs",
+        "github.copilot",
+        "oderwat.indent-rainbow",
+        "mosapride.zenkaku",
+        "humao.rest-client",
+        "dbaeumer.vscode-eslint"
+      ]
+    }
+  }
+}

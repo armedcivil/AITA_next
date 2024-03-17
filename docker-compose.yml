@@ -1,0 +1,19 @@
+version: '3'
+services:
+  app:
+    build: './doc/docker/app'
+    container_name: aita_next_app
+    volumes:
+      - ./:/var/www
+      - aita-next-volumes:/var/www/node_modules
+    ports:
+      - 5000:3000
+    stdin_open: true
+    tty: true
+    networks:
+      - aita-network
+networks:
+  aita-network:
+    external: true
+volumes:
+  aita-next-volumes:
