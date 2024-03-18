@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model admins {
+  id       BigInt @id @default(autoincrement())
+  name     String @db.VarChar(255)
+  email    String @unique(map: "UQ_051db7d37d478a69a7432df1479") @db.VarChar(255)
+  password String @db.VarChar(255)
+}
+
+model companies {
+  id       BigInt  @id @default(autoincrement())
+  name     String  @db.VarChar(255)
+  email    String  @unique(map: "UQ_d0af6f5866201d5cb424767744a") @db.VarChar(255)
+  password String  @db.VarChar(255)
+  users    users[]
+}
+
+model migrations {
+  id        Int    @id @default(autoincrement())
+  timestamp BigInt
+  name      String @db.VarChar(255)
+}
+
+model users {
+  id         BigInt    @id @default(autoincrement())
+  name       String    @db.VarChar(255)
+  email      String    @unique(map: "UQ_97672ac88f789774dd47f7c8be3") @db.VarChar(255)
+  password   String    @db.VarChar(255)
+  company_id BigInt
+  companies  companies @relation(fields: [company_id], references: [id], onDelete: Cascade, map: "user_company_foreign_key")
+
+  @@index([company_id], map: "user_company_foreign_key")
+}
