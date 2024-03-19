@@ -1,25 +1,32 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import { ArrowRightIcon } from "@heroicons/react/24/solid";
-import { Button } from "./button";
-import { useFormStatus } from "react-dom";
+import Image from 'next/image';
+import { ArrowRightIcon } from '@heroicons/react/24/solid';
+import { Button } from './button';
+import { useFormState, useFormStatus } from 'react-dom';
+import { signIn } from '../lib/actions';
 
 export default function LoginForm() {
+  const initialState = { error: { message: '' } };
+  const [state, dispatch] = useFormState(signIn, initialState);
+
   return (
-    <div className={`w-1/2 h-4/5 bg-white`}>
-      <form action="" className="w-full h-full flex items-center flex-col">
+    <div className={`h-4/5 w-1/2 bg-white`}>
+      <form
+        action={dispatch}
+        className="flex h-full w-full flex-col items-center"
+      >
         <Image
-          src={"/img/AITA.png"}
+          src={'/img/AITA.png'}
           alt="AITA service logo"
           width={120}
           height={120}
         />
-        <p className="text-xl mt-8">Wellcome to AITA CMS for companies</p>
+        <p className="mt-8 text-xl">Wellcome to AITA CMS for companies</p>
         <p className="text-xl">Please Login</p>
-        <div className="w-3/4 mt-8 shadow-2xl rounded-lg p-8 border-2 border-gray-100">
+        <div className="mt-8 w-3/4 rounded-lg border-2 border-gray-100 p-8 shadow-2xl">
           <label
-            className="mb-2 block text-xs font-medium text-gray-900 self-start"
+            className="mb-2 block self-start text-xs font-medium text-gray-900"
             htmlFor="email"
           >
             Email
@@ -27,12 +34,12 @@ export default function LoginForm() {
           <input
             id="email"
             type="text"
-            name="password"
+            name="email"
             placeholder="user@example.com"
-            className="w-full h-8 border-2 border-red-400 rounded-lg p-2"
+            className="h-8 w-full rounded-lg border-2 border-red-400 p-2"
           />
           <label
-            className="mb-2 mt-4 block text-xs font-medium text-gray-900 self-start"
+            className="mb-2 mt-4 block self-start text-xs font-medium text-gray-900"
             htmlFor="password"
           >
             Password
@@ -42,7 +49,7 @@ export default function LoginForm() {
             type="password"
             name="password"
             placeholder="12345678"
-            className="w-full h-8 border-2 border-red-400 rounded-lg p-2"
+            className="h-8 w-full rounded-lg border-2 border-red-400 p-2"
           />
           <LoginButton />
         </div>
