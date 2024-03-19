@@ -5,7 +5,7 @@ export default async function Table({
   query,
   page,
 }: {
-  companyId: number;
+  companyId: number | bigint;
   query: string;
   page: number;
 }) {

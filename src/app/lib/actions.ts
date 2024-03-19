@@ -59,3 +59,31 @@ export async function signOut() {
   cookies().delete('token');
   redirect('/');
 }
+
+export async function fetchCompanyProfile(
+  accessToken: string,
+): Promise<{
+  id?: bigint;
+  name?: string;
+  email?: string;
+  error?: { message: string };
+}> {
+  try {
+    const response = await fetcha(`${apiHost}/company/profile`)
+      .header('Authorization', `Bearer ${accessToken}`)
+      .get();
+
+    const data = await response.toJson<{
+      id: bigint;
+      name: string;
+      email: string;
+    }>();
+    return data;
+  } catch (e: any) {
+    return {
+      error: {
+        message: e.message.toString(),
+      },
+    };
+  }
+}

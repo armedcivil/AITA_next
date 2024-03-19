@@ -2,7 +2,7 @@ import prisma from '@/app/lib/prisma';
 const COUNT_PER_PAGE = 10;
 
 export async function fetchUsers(
-  companyId: number,
+  companyId: number | bigint,
   page: number,
   query: string,
 ) {
@@ -33,7 +33,10 @@ export async function fetchUsers(
   return users;
 }
 
-export async function fetchUsersPageCount(companyId: number, query: string) {
+export async function fetchUsersPageCount(
+  companyId: number | bigint,
+  query: string,
+) {
   const count = await prisma.users.count({
     where: {
       company_id: companyId,
