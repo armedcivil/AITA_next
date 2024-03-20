@@ -39,13 +39,13 @@ export async function signIn(prevState: SignInState, formData: FormData) {
 
 export async function checkAuth(
   accessToken: string,
-): Promise<boolean | { error: { message: string } }> {
+): Promise<{ check?: boolean; error?: { message: string } }> {
   try {
     const response = await fetcha(`${apiHost}/auth/check`)
       .header('Authorization', `Bearer ${accessToken}`)
       .get();
 
-    const { check } = await response.toJson<{ check: boolean }>();
+    const check = await response.toJson<{ check: boolean }>();
     return check;
   } catch (e: any) {
     return {

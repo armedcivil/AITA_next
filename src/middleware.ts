@@ -5,14 +5,16 @@ export default async function middleware(request: NextRequest) {
   const accessToken = request.cookies.get('token')?.value;
 
   if (accessToken) {
-    const isAuthenticated = await checkAuth(accessToken);
+    const result = await checkAuth(accessToken);
 
-    if (isAuthenticated) {
+    if (result.check && !result.error) {
       if (request.nextUrl.pathname === '/') {
         return Response.redirect(
           new URL('/company/users', process.env.APP_HOST),
         );
       }
+    } else if (request.nextUrl.pathname !== '/') {
+      return Response.redirect(new URL('/', process.env.APP_HOST));
     }
   } else {
     if (request.nextUrl.pathname !== '/') {
