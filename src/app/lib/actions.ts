@@ -60,9 +60,7 @@ export async function signOut() {
   redirect('/');
 }
 
-export async function fetchCompanyProfile(
-  accessToken: string,
-): Promise<{
+export async function fetchCompanyProfile(accessToken: string): Promise<{
   id?: bigint;
   name?: string;
   email?: string;
@@ -86,4 +84,52 @@ export async function fetchCompanyProfile(
       },
     };
   }
+}
+
+export type CreateUserState =
+  | {
+      error?: {
+        message?: string;
+      };
+    }
+  | undefined;
+
+class UnauthorizedError extends Error {}
+
+export async function createUser(
+  prevState: CreateUserState,
+  formData: FormData,
+) {
+  try {
+    const tokenCookie = cookies().get('token');
+    if (tokenCookie) {
+      await fetcha(`${apiHost}/user`)
+        .body(formData)
+        .header('Content-Type', 'multipart/form-data')
+        .header('Authorization', `Bearer ${tokenCookie.value}`)
+        .post();
+    } else {
+      throw new UnauthorizedError('Unauthorized');
+    }
+  } catch (e: any) {
+    if (e instanceof UnauthorizedError) {
+      redirect('/');
+    }
+
+    let message = e.message.toString();
+    if (e instanceof FetchaError) {
+      if (e.response && e.response.body) {
+        message = JSON.parse(
+          await new Response(e.response.body).text(),
+        ).message;
+      }
+    }
+    return {
+      error: {
+        message: message,
+      },
+    };
+  }
+
+  redirect('/company/users');
 }
