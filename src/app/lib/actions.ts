@@ -1,6 +1,7 @@
 'use server';
 
 import { fetcha, FetchaError } from '@co-labo-hub/fetcha';
+import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
@@ -204,4 +205,34 @@ export async function updateUser(
   }
 
   redirect('/company/users');
+}
+
+export type DeleteUserState = {
+  error?: {
+    message: string;
+  };
+  result?: string;
+};
+
+export async function deleteUser(
+  accessToken: string,
+  userId: string,
+  prevState: DeleteUserState,
+  formData: FormData,
+) {
+  try {
+    const response = await fetcha(`${apiHost}/user/${userId}`)
+      .header('Authorization', `Bearer ${accessToken}`)
+      .delete();
+
+    revalidatePath('/company/users');
+
+    return await response.toJson<{ result: string }>();
+  } catch (e: any) {
+    return {
+      error: {
+        message: e.message.toString(),
+      },
+    };
+  }
 }
