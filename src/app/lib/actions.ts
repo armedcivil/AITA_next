@@ -61,32 +61,6 @@ export async function signOut() {
   redirect('/');
 }
 
-export async function fetchCompanyProfile(accessToken: string): Promise<{
-  id?: bigint;
-  name?: string;
-  email?: string;
-  error?: { message: string };
-}> {
-  try {
-    const response = await fetcha(`${apiHost}/company/profile`)
-      .header('Authorization', `Bearer ${accessToken}`)
-      .get();
-
-    const data = await response.toJson<{
-      id: bigint;
-      name: string;
-      email: string;
-    }>();
-    return data;
-  } catch (e: any) {
-    return {
-      error: {
-        message: e.message.toString(),
-      },
-    };
-  }
-}
-
 export type CreateUserState =
   | {
       error?: {
@@ -228,6 +202,98 @@ export async function deleteUser(
     revalidatePath('/company/users');
 
     return await response.toJson<{ result: string }>();
+  } catch (e: any) {
+    return {
+      error: {
+        message: e.message.toString(),
+      },
+    };
+  }
+}
+
+export async function fetchCompanyProfile(): Promise<{
+  id?: bigint;
+  name?: string;
+  email?: string;
+  error?: { message: string };
+}> {
+  try {
+    const tokenCookie = cookies().get('token');
+    if (tokenCookie) {
+      const response = await fetcha(`${apiHost}/company/profile`)
+        .header('Authorization', `Bearer ${tokenCookie.value}`)
+        .get();
+
+      const data = await response.toJson<{
+        id: bigint;
+        name: string;
+        email: string;
+      }>();
+      return data;
+    } else {
+      return {
+        error: {
+          message: 'Unauthorized',
+        },
+      };
+    }
+  } catch (e: any) {
+    return {
+      error: {
+        message: e.message.toString(),
+      },
+    };
+  }
+}
+
+export type UpdateCompanyState = {
+  error?: {
+    message: string;
+  };
+  result?: string;
+};
+
+export async function updateCompanyProfile(
+  prevState: UpdateCompanyState,
+  formData: FormData,
+): Promise<{
+  error?: { message: string };
+  result?: string;
+}> {
+  try {
+    const requestBody: {
+      id: number;
+      name: string;
+      email: string;
+      password?: string
+      passwordConfirmation?: string;
+    } = {
+      id: parseInt(formData.get('id')!.toString()), 
+      name: formData.get('name')!.toString(), 
+      email: formData.get('email')!.toString() 
+    }
+
+    if (formData.get('password')) {
+      requestBody.password = formData.get('password')!.toString();
+      requestBody.passwordConfirmation = formData.get('passwordConfirmation')!.toString();
+    }
+
+    const tokenCookie = cookies().get('token');
+    if (tokenCookie) {
+      const response = await fetcha(`${apiHost}/company/profile`)
+        .body(requestBody)
+        .header('Content-Type', 'application/json')
+        .header('Authorization', `Bearer ${tokenCookie.value}`)
+        .patch();
+
+      const data = await response.toJson<{ result: string }>();
+      return data;
+    }
+    return {
+      error: {
+        message: 'Unauthorized',
+      },
+    };
   } catch (e: any) {
     return {
       error: {
