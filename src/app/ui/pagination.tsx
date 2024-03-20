@@ -3,7 +3,6 @@
 import { useSearchParams, usePathname } from 'next/navigation';
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import { PaginationButton } from './buttons';
-import clsx from 'clsx';
 
 export default function Pagination({ maxPage }: { maxPage: number }) {
   const searchParams = useSearchParams();
@@ -22,19 +21,13 @@ export default function Pagination({ maxPage }: { maxPage: number }) {
   return (
     <div className="flex flex-row items-center">
       <div className="mr-2 w-12">
-        <PaginationButton
-          href={previousPageUrl}
-          className={clsx('w-12', { hidden: currentPage === 1 })}
-        >
+        <PaginationButton href={previousPageUrl} disable={currentPage <= 1}>
           <ArrowLeftIcon className="h-5" />
         </PaginationButton>
       </div>
       <div className="w-14 text-center">{`${currentPage} / ${maxPage}`}</div>
       <div className="ml-2 w-12">
-        <PaginationButton
-          href={nextPageUrl}
-          className={clsx('w-12', { hidden: currentPage === maxPage })}
-        >
+        <PaginationButton href={nextPageUrl} disable={currentPage >= maxPage}>
           <ArrowRightIcon className="h-5" />
         </PaginationButton>
       </div>

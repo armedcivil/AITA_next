@@ -21,18 +21,26 @@ export function PaginationButton({
   children,
   href,
   className,
+  disable,
 }: {
   children: React.ReactNode;
   href: string;
   className?: string | null;
+  disable?: boolean;
 }) {
   return (
     <Link
       href={href}
       className={clsx(
-        'flex h-10 items-center rounded-lg bg-red-400 px-4 text-sm font-medium text-white transition-colors hover:bg-red-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 active:bg-red-600 aria-disabled:cursor-not-allowed aria-disabled:opacity-50',
+        'flex h-10 w-12 items-center rounded-lg bg-red-400 px-4 text-sm font-medium text-white transition-colors hover:bg-red-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 active:bg-red-600 aria-disabled:cursor-not-allowed aria-disabled:opacity-50',
+        {
+          'pointer-events-none bg-red-100 hover:bg-red-100 active:bg-red-100':
+            disable,
+        },
         className,
       )}
+      aria-disabled={disable}
+      tabIndex={disable ? -1 : undefined}
     >
       {children}
     </Link>
