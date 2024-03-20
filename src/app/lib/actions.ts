@@ -133,3 +133,75 @@ export async function createUser(
 
   redirect('/company/users');
 }
+
+export type UpdateUserState =
+  | {
+      error?: {
+        message?: string;
+      };
+    }
+  | undefined;
+
+export async function updateUser(
+  id: string,
+  prevState: UpdateUserState,
+  formData: FormData,
+) {
+  const deleteKeys: string[] = [];
+  formData.forEach((value, key, parent) => {
+    if (
+      ![
+        'id',
+        'name',
+        'email',
+        'password',
+        'icon',
+        'passwordConfirmation',
+      ].includes(key)
+    ) {
+      deleteKeys.push(key);
+    }
+  });
+  for (const key in deleteKeys) {
+    formData.delete(deleteKeys[key]);
+  }
+
+  try {
+    const tokenCookie = cookies().get('token');
+    if (tokenCookie) {
+      const password = formData.get('password');
+      if (!password) {
+        formData.delete('password');
+        formData.delete('passwordConfirmation');
+      }
+
+      await fetcha(`${apiHost}/user/${id}`)
+        .body(formData)
+        .header('Content-Type', 'multipart/form-data')
+        .header('Authorization', `Bearer ${tokenCookie.value}`)
+        .patch();
+    } else {
+      throw new UnauthorizedError('Unauthorized');
+    }
+  } catch (e: any) {
+    if (e instanceof UnauthorizedError) {
+      redirect('/');
+    }
+
+    let message = e.message.toString();
+    if (e instanceof FetchaError) {
+      if (e.response && e.response.body) {
+        message = JSON.parse(
+          await new Response(e.response.body).text(),
+        ).message;
+      }
+    }
+    return {
+      error: {
+        message: message,
+      },
+    };
+  }
+
+  redirect('/company/users');
+}

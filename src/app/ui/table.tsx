@@ -1,4 +1,6 @@
 import Image from 'next/image';
+import Link from 'next/link';
+import { PencilIcon } from '@heroicons/react/24/outline';
 import { fetchUsers } from '../lib/data';
 
 export default async function Table({
@@ -41,7 +43,11 @@ export default async function Table({
               </td>
               <td className="px-4 py-2">{user.name}</td>
               <td className="px-4 py-2">{user.email}</td>
-              <td></td>
+              <td className="px-4 py-2">
+                <Link href={`/company/users/${user.id}/edit`}>
+                  <PencilIcon className="h-4 w-4" />
+                </Link>
+              </td>
             </tr>
           );
         })}
