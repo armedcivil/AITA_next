@@ -13,6 +13,7 @@ export async function fetchUsers(
       id: true,
       name: true,
       email: true,
+      icon_image_path: true,
     },
     where: {
       company_id: companyId,
