@@ -21,6 +21,7 @@ export default function LoginForm() {
           alt="AITA service logo"
           width={120}
           height={120}
+          priority={true}
         />
         <p className="mt-8 text-xl">Wellcome to AITA CMS for companies</p>
         <p className="text-xl">Please Login</p>
