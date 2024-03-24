@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Scene, { SceneMethod } from '@/app/ui/three/scene';
-import { Canvas } from '@/app/lib/three/three-fiber-exporter';
+import { Canvas, useThree } from '@/app/lib/three/three-fiber-exporter';
 
 export default function Page() {
   const [isEditMode, setEditMode] = useState(true);
@@ -12,7 +12,16 @@ export default function Page() {
     <div>
       <div className="flex justify-center">
         <div className="h-[400px] w-[600px]">
-          <Canvas className="bg-gray-300">
+          <Canvas
+            className="bg-gray-300"
+            camera={{
+              fov: 75,
+              near: 0.1,
+              far: 800,
+              position: [0, 5, 0],
+              rotation: [-(Math.PI / 2), 0, 0],
+            }}
+          >
             <Scene isEditMode={isEditMode} ref={sceneRef} />
           </Canvas>
           <button onClick={() => setEditMode(!isEditMode)}> switch </button>

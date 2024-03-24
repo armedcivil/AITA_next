@@ -1,45 +1,18 @@
 'use client';
 
-import { useThree } from '@/app/lib/three/three-fiber-exporter';
+import { useThree, buildGraph } from '@/app/lib/three/three-fiber-exporter';
+import { Select, useSelect } from '@/app/lib/three/three-drei-exporter';
 import * as THREE from 'three';
-import { CameraControls } from '@/app/lib/three/three-drei-exporter';
 import {
   useEffect,
   forwardRef,
   useImperativeHandle,
-  MutableRefObject,
-  RefObject,
+  useState,
+  useRef,
 } from 'react';
-
-function CanvasSetting() {
-  const setSize = useThree((state) => state.setSize);
-  const renderer = useThree((state) => state.gl);
-  setSize(600, 400);
-  renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-
-  return <></>;
-}
-
-function PositionSwitchCamera({ isEditMode }: { isEditMode: boolean }) {
-  const scene = useThree((state) => state.scene);
-
-  useEffect(() => {
-    const changeView = async () => {
-      const controls = (scene as any).cameraControls;
-      if (isEditMode) {
-        controls.enabled = true;
-        await controls.setLookAt(0, 5, 0, 0, 0, 0, true);
-      } else {
-        await controls.setLookAt(-5, 5, 5, 0, 0, 0, true);
-        controls.enabled = false;
-      }
-      controls.saveState();
-    };
-    changeView().then();
-  }, [isEditMode, scene]);
-  return <></>;
-}
+import CanvasSetting from '@/app/ui/three/canvas-setting';
+import PositionSwitchCamera from '@/app/ui/three/position-switch-camera';
+import Pivot, { PivotMethod } from '@/app/ui/three/pivot';
 
 export interface SceneMethod {
   reset: () => void;
@@ -47,12 +20,37 @@ export interface SceneMethod {
 
 const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
   const scene = useThree((state) => state.scene);
+  const renderer = useThree((state) => state.gl);
+  const pivotRef = useRef<PivotMethod | null>(null);
+  const [selected, setSelected] = useState<
+    THREE.Object3D<THREE.Object3DEventMap>[]
+  >([]);
+
+  const allObject = [
+    [-1.5, 0, 0],
+    [1.5, 0, 0],
+  ].map((value) => {
+    const material = new THREE.MeshStandardMaterial();
+    const geometory = new THREE.BoxGeometry(1, 1, 1);
+    const mesh = new THREE.Mesh(geometory, material);
+    mesh.position.set(value[0], value[1], value[2]);
+    return mesh;
+  });
 
   useImperativeHandle(ref, () => ({
     reset() {
       (scene as any).cameraControls.reset(true);
     },
   }));
+
+  useEffect(() => {
+    const canvas = renderer.domElement;
+    canvas.addEventListener('webglcontextlost', (e) => {
+      e.preventDefault();
+      THREE.Cache.clear();
+      renderer.forceContextRestore();
+    });
+  }, [renderer]);
 
   return (
     <>
@@ -63,18 +61,32 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
         position={[0, 5, 0]}
         rotation={[-(Math.PI / 2), 0, 0]}
       />
-      <mesh position={[1, 0, 0.5]}>
-        <boxGeometry args={[1, 0.1, 1]} />
-        <meshStandardMaterial />
-      </mesh>
 
-      <mesh position={[-1, 0, 0]}>
-        <boxGeometry args={[1, 0.1, 2]} />
-        <meshStandardMaterial color="red" />
-      </mesh>
-
-      <CameraControls makeDefault attach="cameraControls" />
       <PositionSwitchCamera isEditMode={isEditMode} />
+
+      <Select
+        multiple
+        box
+        onChangePointerUp={(array) => {
+          if (pivotRef.current) {
+            pivotRef.current.clear();
+          }
+          setSelected(array);
+        }}
+      >
+        {allObject
+          .filter((value) => selected.indexOf(value) === -1)
+          .map((value, i) => {
+            return <primitive key={i} object={value} />;
+          })}
+        <group>
+          {selected.map((value, i) => {
+            return <primitive key={i} object={value} />;
+          })}
+        </group>
+      </Select>
+
+      <Pivot isEditMode={isEditMode} ref={pivotRef}></Pivot>
 
       <gridHelper args={[200, 20]} />
     </>

@@ -16,6 +16,7 @@ export default function TopNav() {
         height={56}
         alt="AITA logo"
         className="justify-self-start"
+        priority={true}
       />
       <div className="ml-6 h-full px-6">
         <Link
