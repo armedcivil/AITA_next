@@ -53,12 +53,14 @@ type PivotControlsProps = {
 
 export interface PivotMethod {
   clear: () => void;
+  attach: (object: THREE.Object3D) => void;
 }
 
 const Pivot = function (
   {
     children,
     isEditMode,
+    anchor,
   }: PivotControlsProps & {
     isEditMode: boolean;
   },
@@ -73,6 +75,11 @@ const Pivot = function (
         groupRef.current!.clear();
       }
     },
+    attach(object: THREE.Object3D) {
+      if (groupRef.current) {
+        groupRef.current!.attach(object);
+      }
+    },
   }));
 
   const handleDragStart = () => {
@@ -85,6 +92,7 @@ const Pivot = function (
 
   return (
     <PivotControls
+      anchor={anchor}
       scale={3}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}

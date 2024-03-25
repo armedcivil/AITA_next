@@ -21,14 +21,10 @@ export interface SceneMethod {
 const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
   const scene = useThree((state) => state.scene);
   const renderer = useThree((state) => state.gl);
-  const pivotRef = useRef<PivotMethod | null>(null);
-  const [selected, setSelected] = useState<
-    THREE.Object3D<THREE.Object3DEventMap>[]
-  >([]);
 
   const allObject = [
-    [-1.5, 0, 0],
-    [1.5, 0, 0],
+    [-1.5, 0.5, 0],
+    [1.5, 0.5, 0],
   ].map((value) => {
     const material = new THREE.MeshStandardMaterial();
     const geometory = new THREE.BoxGeometry(1, 1, 1);
@@ -64,29 +60,13 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
 
       <PositionSwitchCamera isEditMode={isEditMode} />
 
-      <Select
-        multiple
-        box
-        onChangePointerUp={(array) => {
-          if (pivotRef.current) {
-            pivotRef.current.clear();
-          }
-          setSelected(array);
-        }}
-      >
-        {allObject
-          .filter((value) => selected.indexOf(value) === -1)
-          .map((value, i) => {
-            return <primitive key={i} object={value} />;
-          })}
-        <group>
-          {selected.map((value, i) => {
-            return <primitive key={i} object={value} />;
-          })}
-        </group>
-      </Select>
-
-      <Pivot isEditMode={isEditMode} ref={pivotRef}></Pivot>
+      {allObject.map((value, i) => {
+        return (
+          <Pivot key={i} isEditMode={isEditMode} anchor={[0, -1, 0]}>
+            <primitive object={value} />
+          </Pivot>
+        );
+      })}
 
       <gridHelper args={[200, 20]} />
     </>
