@@ -35,6 +35,7 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
       });
       const geometory = new THREE.BoxGeometry(1, 1, 1);
       const mesh = new THREE.Mesh(geometory, material);
+      mesh.layers.enable(2);
       mesh.position.set(Number(value[0]), Number(value[1]), Number(value[2]));
       return mesh;
     }),
@@ -151,6 +152,12 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
       <Select
         ref={selectRef}
         isEditMode={isEditMode}
+        onSelectionStart={() => {
+          (scene as any).cameraControls.enabled = false;
+        }}
+        onSelectionEnd={() => {
+          (scene as any).cameraControls.enabled = true;
+        }}
         onSelectionChange={(objectArray) => {
           const groupCenter = calcurateGroupCenter(objectArray);
           attachObjectsToSelectedGroup(objectArray, groupCenter);
