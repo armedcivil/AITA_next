@@ -25,7 +25,9 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
   const allObject = useRef<THREE.Object3D[]>(
     [
       [-1.5, 0.5, 0, '#ffaaaa'],
+      [-1.5, 0.5, -1.5, '#ffbbaa'],
       [1.5, 0.5, 0, '#aaaaff'],
+      [1.5, 0.5, 1.5, '#aabbff'],
     ].map((value) => {
       const material = new THREE.MeshStandardMaterial({
         color: value[3],
@@ -91,6 +93,48 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
     }
   };
 
+  const calcurateGroupCenter = (objectArray: THREE.Object3D[]) => {
+    return objectArray
+      .map((object) => {
+        const world = new THREE.Vector3();
+        object.getWorldPosition(world);
+        return world;
+      })
+      .reduce(
+        (pre, cur, ind, arr) => {
+          return pre.add(cur.multiplyScalar(1 / arr.length));
+        },
+        new THREE.Vector3(0, 0, 0),
+      );
+  };
+
+  const attachObjectsToSelectedGroup = (
+    objectArray: THREE.Object3D[],
+    groupCenter: THREE.Vector3,
+  ) => {
+    objectArray.forEach((object) => {
+      if (object.type === 'Mesh') {
+        highlight(object as THREE.Mesh);
+      }
+      const world = new THREE.Vector3();
+      object.getWorldPosition(world);
+      const local = world.sub(groupCenter);
+      selectedGroup.current?.attach(object);
+      object.position.set(local.x, local.y, local.z);
+    });
+  };
+
+  const attachObjectsToSelectGroup = (objectArray: THREE.Object3D[]) => {
+    allObject.current
+      ?.filter((object: THREE.Object3D) => objectArray.indexOf(object) === -1)
+      .forEach((object: THREE.Object3D) => {
+        if (object.type === 'Mesh') {
+          unhighlight(object as THREE.Mesh);
+        }
+        selectRef.current?.attach(object);
+      });
+  };
+
   return (
     <>
       <CanvasSetting />
@@ -108,31 +152,24 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
         ref={selectRef}
         isEditMode={isEditMode}
         onSelectionChange={(objectArray) => {
-          objectArray.forEach((object) => {
-            if (object.type === 'Mesh') {
-              highlight(object as THREE.Mesh);
-            }
-            selectedGroup.current?.attach(object);
-          });
-          allObject.current
-            ?.filter(
-              (object: THREE.Object3D) => objectArray.indexOf(object) === -1,
-            )
-            .forEach((object: THREE.Object3D) => {
-              if (object.type === 'Mesh') {
-                unhighlight(object as THREE.Mesh);
-              }
-              selectRef.current?.attach(object);
-            });
+          const groupCenter = calcurateGroupCenter(objectArray);
+          attachObjectsToSelectedGroup(objectArray, groupCenter);
+          attachObjectsToSelectGroup(objectArray);
+
+          if (selectedGroup.current) {
+            selectedGroup.current.position.set(
+              groupCenter.x,
+              groupCenter.y,
+              groupCenter.z,
+            );
+          }
         }}
       >
-        {/* TODO: group 中心の再計算 */}
         <group name="1" ref={selectedGroup}></group>
       </Select>
 
       {/* 
         TODO: isEditMode が true の時のみ有効
-        TODO: 見た目を PivotControls に近づけたい
       */}
       <TransformControls
         attach="transformControls"
