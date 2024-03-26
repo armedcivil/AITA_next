@@ -107,7 +107,7 @@ export const Select = forwardRef(function Select(
     const oldControlsEnabled = (controls as any)?.enabled;
 
     const handleDragStart = (event: any) => {
-      if (!event.shiftKey) {
+      if (!event.shiftKey || !isEditMode) {
         return;
       }
       event.stopPropagation();
@@ -132,7 +132,7 @@ export const Select = forwardRef(function Select(
     };
 
     const handleDrag = (event: any) => {
-      if (!event.shiftKey) {
+      if (!event.shiftKey || !isEditMode) {
         element.parentElement?.removeChild(element);
         return;
       }
@@ -147,7 +147,7 @@ export const Select = forwardRef(function Select(
     };
 
     const handleDragEnd = (event: any) => {
-      if (!event.shiftKey) {
+      if (!event.shiftKey || !isEditMode) {
         element.parentElement?.removeChild(element);
         return;
       }

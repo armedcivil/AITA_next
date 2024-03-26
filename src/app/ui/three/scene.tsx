@@ -148,7 +148,6 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
 
       <PositionSwitchCamera isEditMode={isEditMode} />
 
-      {/* TODO: THREE.selectionBox の利用 */}
       <Select
         ref={selectRef}
         isEditMode={isEditMode}
@@ -175,13 +174,11 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
         <group name="1" ref={selectedGroup}></group>
       </Select>
 
-      {/* 
-        TODO: isEditMode が true の時のみ有効
-      */}
       <TransformControls
         attach="transformControls"
         object={selectedGroup.current!}
         showY={false}
+        enabled={isEditMode}
       />
 
       <gridHelper args={[200, 20]} />
