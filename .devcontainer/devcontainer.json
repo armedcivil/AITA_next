@@ -32,7 +32,8 @@
         "oderwat.indent-rainbow",
         "mosapride.zenkaku",
         "humao.rest-client",
-        "dbaeumer.vscode-eslint"
+        "dbaeumer.vscode-eslint",
+        "gruntfuggly.todo-tree"
       ]
     }
   }
