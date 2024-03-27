@@ -16,6 +16,8 @@ import { useThree } from '@react-three/fiber';
 export interface SelectMethod {
   add: (objects: THREE.Object3D) => void;
   attach: (object: THREE.Object3D) => void;
+  toJSON: () => object;
+  clear: () => void;
 }
 
 // Select コンポーネントの宣言
@@ -73,6 +75,18 @@ export const Select = forwardRef(function Select(
     attach(object: THREE.Object3D) {
       groupRef.current?.attach(object);
     },
+    toJSON() {
+      return groupRef.current?.children
+        .filter((child) => child.layers.isEnabled(2))
+        .map((child) => child.toJSON());
+    },
+    clear() {
+      groupRef.current?.children
+        .filter((child) => child.layers.isEnabled(2))
+        .concat()
+        .forEach((child) => child.removeFromParent());
+      dispatch({});
+    },
   }));
 
   // 選択状態になった Object3D を親に通知するコールバックを呼び出す useEffect
@@ -89,6 +103,7 @@ export const Select = forwardRef(function Select(
   // クリックされた時のコールバック
   // event.object で raycast に当たった Object3D が取得できる
   const handleClick = useCallback((event: any) => {
+    // TODO: クリック時に範囲選択のDOMが表示されている
     event.stopPropagation();
     dispatch({ object: event.object, shift: event.shiftKey });
   }, []);

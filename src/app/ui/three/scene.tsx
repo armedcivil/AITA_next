@@ -16,13 +16,15 @@ import { Select, SelectMethod } from '@/app/ui/three/select';
 
 export interface SceneMethod {
   reset: () => void;
+  toJSON: () => object;
+  restore: (json: object) => void;
 }
 
 const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
   const scene = useThree((state) => state.scene);
   const renderer = useThree((state) => state.gl);
   const [initialized, setInitialized] = useState(false);
-  const allObject = useRef<THREE.Object3D[]>(
+  const [allObject, setAllObject] = useState<THREE.Object3D[]>(
     [
       [-1.5, 0.5, 0, '#ffaaaa'],
       [-1.5, 0.5, -1.5, '#ffbbaa'],
@@ -44,9 +46,28 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
   const selectedGroup = useRef<THREE.Group<THREE.Object3DEventMap>>(null);
   const selectRef = useRef<SelectMethod>(null);
 
+  const loader = new THREE.ObjectLoader();
+
   useImperativeHandle(ref, () => ({
+    // TODO: resetCamera に変更
     reset() {
       (scene as any).cameraControls.reset(true);
+    },
+    toJSON() {
+      attachObjectsToSelectGroup([]);
+      return { objects: selectRef.current?.toJSON() };
+    },
+    restore(json: object) {
+      selectRef.current?.clear();
+      selectedGroup.current?.clear();
+      let object3Ds: THREE.Object3D[] = [];
+      if ((json as any).objects) {
+        object3Ds = ((json as any).objects as THREE.Object3D[]).map((value) => {
+          return loader.parse(value);
+        });
+      }
+      setAllObject(object3Ds);
+      setInitialized(false);
     },
   }));
 
@@ -65,12 +86,12 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
 
   useEffect(() => {
     if (!initialized) {
-      allObject.current?.forEach((value: THREE.Object3D) => {
+      allObject.forEach((value: THREE.Object3D) => {
         selectRef.current?.add(value);
       });
       setInitialized(true);
     }
-  }, [initialized]);
+  }, [allObject, initialized]);
 
   const highlight = (mesh: THREE.Mesh) => {
     const setting = { transparent: true, opacity: 0.5, alphaTest: 0.5 };
@@ -126,8 +147,8 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
   };
 
   const attachObjectsToSelectGroup = (objectArray: THREE.Object3D[]) => {
-    allObject.current
-      ?.filter((object: THREE.Object3D) => objectArray.indexOf(object) === -1)
+    allObject
+      .filter((object: THREE.Object3D) => objectArray.indexOf(object) === -1)
       .forEach((object: THREE.Object3D) => {
         if (object.type === 'Mesh') {
           unhighlight(object as THREE.Mesh);
@@ -171,7 +192,7 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
           }
         }}
       >
-        <group name="1" ref={selectedGroup}></group>
+        <group ref={selectedGroup}></group>
       </Select>
 
       <TransformControls
