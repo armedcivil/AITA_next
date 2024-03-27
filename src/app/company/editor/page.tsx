@@ -26,26 +26,29 @@ export default function Page() {
           >
             <Scene isEditMode={isEditMode} ref={sceneRef} />
           </Canvas>
-          <button onClick={() => setEditMode(!isEditMode)}> switch </button>
-          <button onClick={() => sceneRef.current!.resetCamera()}>
-            reset camera
-          </button>
-          <button onClick={() => setJson(sceneRef.current!.toJSON())}>
-            to json
-          </button>
-          <button onClick={() => sceneRef.current!.restore(json)}>
-            restore
-          </button>
-          <button
-            onClick={() => sceneRef.current!.changeTransformMode('translate')}
-          >
-            translate
-          </button>
-          <button
-            onClick={() => sceneRef.current!.changeTransformMode('rotate')}
-          >
-            rotate
-          </button>
+          <div className="flex flex-col">
+            <button onClick={() => setEditMode(!isEditMode)}> switch </button>
+            <button onClick={() => sceneRef.current!.resetCamera()}>
+              reset camera
+            </button>
+            <button onClick={() => setJson(sceneRef.current!.toJSON())}>
+              to json
+            </button>
+            <button onClick={() => sceneRef.current!.restore(json)}>
+              restore
+            </button>
+            <button
+              onClick={() => sceneRef.current!.changeTransformMode('translate')}
+            >
+              translate
+            </button>
+            <button
+              onClick={() => sceneRef.current!.changeTransformMode('rotate')}
+            >
+              rotate
+            </button>
+          </div>
+
           <textarea
             className="h-[100px] w-[600px] whitespace-pre-wrap"
             value={JSON.stringify(json, null, 2)}
