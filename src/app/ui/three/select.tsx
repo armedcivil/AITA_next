@@ -97,13 +97,22 @@ export const Select = forwardRef(function Select(
 
   // raycast に何も当たらなかった時のコールバック
   const handlePointerMissed = useCallback((event: any) => {
+    renderer.domElement.parentElement
+      ?.querySelectorAll('.selectBox')
+      .forEach((element, index, parent) => {
+        element.parentElement?.removeChild(element);
+      });
     dispatch({});
   }, []);
 
   // クリックされた時のコールバック
   // event.object で raycast に当たった Object3D が取得できる
   const handleClick = useCallback((event: any) => {
-    // TODO: クリック時に範囲選択のDOMが表示されている
+    renderer.domElement.parentElement
+      ?.querySelectorAll('.selectBox')
+      .forEach((element, index, parent) => {
+        element.parentElement?.removeChild(element);
+      });
     event.stopPropagation();
     dispatch({ object: event.object, shift: event.shiftKey });
   }, []);
