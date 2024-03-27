@@ -1,7 +1,7 @@
 'use client';
 
 import * as THREE from 'three';
-import { SelectionBox, SelectionHelper } from 'three-stdlib';
+import { SelectionBox } from 'three-stdlib';
 import {
   forwardRef,
   useRef,
@@ -39,8 +39,6 @@ export const Select = forwardRef(function Select(
   const scene = useThree((state) => state.scene);
   const camera = useThree((state) => state.camera);
   const renderer = useThree((state) => state.gl);
-  const setEvents = useThree((state) => state.setEvents);
-  const get = useThree((state) => state.get);
   const controls = useThree((state) => state.controls);
   const size = useThree((state) => state.size);
 
@@ -88,7 +86,7 @@ export const Select = forwardRef(function Select(
     dispatch({});
   }, []);
 
-  // group がクリックされた時のコールバック
+  // クリックされた時のコールバック
   // event.object で raycast に当たった Object3D が取得できる
   const handleClick = useCallback((event: any) => {
     event.stopPropagation();
@@ -103,14 +101,12 @@ export const Select = forwardRef(function Select(
     const element = document.createElement('div');
     element.classList.add('selectBox');
 
-    const oldRaycasterEnabled = get().events.enabled;
     const oldControlsEnabled = (controls as any)?.enabled;
 
-    const handleDragStart = (event: any) => {
+    function handleDragStart(event: any) {
       if (!event.shiftKey || !isEditMode) {
         return;
       }
-      event.stopPropagation();
       selectionBox.startPoint.set(
         (event.offsetX / windowSize.x) * 2 - 1,
         -(event.offsetY / windowSize.y) * 2 + 1,
@@ -119,7 +115,6 @@ export const Select = forwardRef(function Select(
       if (controls) {
         (controls as any).enabled = false;
       }
-      setEvents({ enabled: false });
       onSelectionStart?.();
 
       renderer.domElement.parentElement?.appendChild(element);
@@ -129,14 +124,13 @@ export const Select = forwardRef(function Select(
       element.style.top = `${event.clientY}px`;
       element.style.width = '0px';
       element.style.height = '0px';
-    };
+    }
 
-    const handleDrag = (event: any) => {
+    function handleDrag(event: any) {
       if (!event.shiftKey || !isEditMode) {
         element.parentElement?.removeChild(element);
         return;
       }
-      event.stopPropagation();
       selectionBox.endPoint.set(
         (event.offsetX / windowSize.x) * 2 - 1,
         -(event.offsetY / windowSize.y) * 2 + 1,
@@ -144,10 +138,18 @@ export const Select = forwardRef(function Select(
       );
       element.style.width = `${event.clientX - elementStartPoint.x}px`;
       element.style.height = `${event.clientY - elementStartPoint.y}px`;
-    };
+    }
 
-    const handleDragEnd = (event: any) => {
-      if (!event.shiftKey || !isEditMode) {
+    function handleDragEnd(event: any) {
+      const endPoint = new THREE.Vector2(
+        (event.offsetX / windowSize.x) * 2 - 1,
+        -(event.offsetY / windowSize.y) * 2 + 1,
+      );
+      const distance = elementStartPoint.distanceTo(
+        new THREE.Vector2(event.clientX, event.clientY),
+      );
+
+      if (!event.shiftKey || !isEditMode || distance < 10) {
         element.parentElement?.removeChild(element);
         return;
       }
@@ -157,14 +159,9 @@ export const Select = forwardRef(function Select(
             ? oldControlsEnabled
             : true;
       }
-      setEvents({ enabled: oldRaycasterEnabled });
       onSelectionEnd?.();
 
-      selectionBox.endPoint.set(
-        (event.offsetX / windowSize.x) * 2 - 1,
-        -(event.offsetY / windowSize.y) * 2 + 1,
-        0.3,
-      );
+      selectionBox.endPoint.set(endPoint.x, endPoint.y, 0.3);
       var selected = selectionBox.select();
       dispatch({
         object: selected.filter(
@@ -174,18 +171,25 @@ export const Select = forwardRef(function Select(
       element.style.width = `${event.clientX - elementStartPoint.x}px`;
       element.style.height = `${event.clientY - elementStartPoint.y}px`;
       element.parentElement?.removeChild(element);
-    };
+    }
 
-    document.addEventListener('pointerdown', handleDragStart);
-    document.addEventListener('pointermove', handleDrag);
-    document.addEventListener('pointerup', handleDragEnd);
+    renderer.domElement.addEventListener('pointerdown', handleDragStart, {
+      passive: true,
+    });
+    renderer.domElement.addEventListener('pointermove', handleDrag, {
+      passive: true,
+      capture: true,
+    });
+    renderer.domElement.addEventListener('pointerup', handleDragEnd, {
+      passive: true,
+    });
 
     return () => {
-      document.removeEventListener('pointerdown', handleDragStart);
-      document.removeEventListener('pointermove', handleDrag);
-      document.removeEventListener('pointerup', handleDragEnd);
+      renderer.domElement.removeEventListener('pointerdown', handleDragStart);
+      renderer.domElement.removeEventListener('pointermove', handleDrag, true);
+      renderer.domElement.removeEventListener('pointerup', handleDragEnd);
     };
-  }, []);
+  });
 
   return (
     <group
