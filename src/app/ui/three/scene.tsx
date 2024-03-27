@@ -155,8 +155,10 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
   };
 
   const attachObjectsToSelectGroup = (objectArray: THREE.Object3D[]) => {
-    allObject
-      .filter((object: THREE.Object3D) => objectArray.indexOf(object) === -1)
+    selectedGroup
+      .current!.children.filter(
+        (object: THREE.Object3D) => objectArray.indexOf(object) === -1,
+      )
       .forEach((object: THREE.Object3D) => {
         if (object.type === 'Mesh') {
           unhighlight(object as THREE.Mesh);
