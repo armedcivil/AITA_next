@@ -1,6 +1,6 @@
 'use client';
 
-import { useThree } from '@/app/lib/three/three-fiber-exporter';
+import { useFrame, useThree } from '@/app/lib/three/three-fiber-exporter';
 import { TransformControls } from '@/app/lib/three/three-drei-exporter';
 import * as THREE from 'three';
 import React, {
@@ -122,7 +122,7 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
     }
   };
 
-  const calcurateGroupCenter = (objectArray: THREE.Object3D[]) => {
+  const calculateGroupCenter = (objectArray: THREE.Object3D[]) => {
     return objectArray
       .map((object) => {
         const world = new THREE.Vector3();
@@ -189,7 +189,7 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
           (scene as any).cameraControls.enabled = true;
         }}
         onSelectionChange={(objectArray) => {
-          const groupCenter = calcurateGroupCenter(objectArray);
+          const groupCenter = calculateGroupCenter(objectArray);
           attachObjectsToSelectedGroup(objectArray, groupCenter);
           attachObjectsToSelectGroup(objectArray);
 
