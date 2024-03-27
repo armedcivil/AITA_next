@@ -18,6 +18,7 @@ export interface SceneMethod {
   resetCamera: () => void;
   toJSON: () => object;
   restore: (json: object) => void;
+  changeTransformMode: (mode: 'translate' | 'rotate') => void;
 }
 
 const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
@@ -42,12 +43,16 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
       return mesh;
     }),
   );
+  const [transformMode, setTransformMode] = useState<'translate' | 'rotate'>(
+    'translate',
+  );
 
   const selectedGroup = useRef<THREE.Group<THREE.Object3DEventMap>>(null);
   const selectRef = useRef<SelectMethod>(null);
 
   const loader = new THREE.ObjectLoader();
 
+  // TODO: TransformControls の mode 切り換え用メソッドの実装
   useImperativeHandle(ref, () => ({
     resetCamera() {
       (scene as any).cameraControls.reset(true);
@@ -67,6 +72,9 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
       }
       setAllObject(object3Ds);
       setInitialized(false);
+    },
+    changeTransformMode(mode: 'translate' | 'rotate') {
+      setTransformMode(mode);
     },
   }));
 
@@ -129,6 +137,7 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
       );
   };
 
+  // TODO: attach されるときに group の角度のことを考えられていない
   const attachObjectsToSelectedGroup = (
     objectArray: THREE.Object3D[],
     groupCenter: THREE.Vector3,
@@ -197,8 +206,11 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
       <TransformControls
         attach="transformControls"
         object={selectedGroup.current!}
-        showY={false}
+        showX={transformMode !== 'rotate'}
+        showY={transformMode === 'rotate'}
+        showZ={transformMode !== 'rotate'}
         enabled={isEditMode}
+        mode={transformMode}
       />
 
       <gridHelper args={[200, 20]} />

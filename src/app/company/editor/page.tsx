@@ -36,6 +36,16 @@ export default function Page() {
           <button onClick={() => sceneRef.current!.restore(json)}>
             restore
           </button>
+          <button
+            onClick={() => sceneRef.current!.changeTransformMode('translate')}
+          >
+            translate
+          </button>
+          <button
+            onClick={() => sceneRef.current!.changeTransformMode('rotate')}
+          >
+            rotate
+          </button>
           <textarea
             className="h-[100px] w-[600px] whitespace-pre-wrap"
             value={JSON.stringify(json, null, 2)}
