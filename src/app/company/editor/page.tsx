@@ -27,15 +27,13 @@ export default function Page() {
             <Scene isEditMode={isEditMode} ref={sceneRef} />
           </Canvas>
           <button onClick={() => setEditMode(!isEditMode)}> switch </button>
-          <button onClick={() => sceneRef.current!.reset()}>
+          <button onClick={() => sceneRef.current!.resetCamera()}>
             reset camera
           </button>
           <button onClick={() => setJson(sceneRef.current!.toJSON())}>
             to json
           </button>
-          <button
-            onClick={() => sceneRef.current!.restore(json)}
-          >
+          <button onClick={() => sceneRef.current!.restore(json)}>
             restore
           </button>
           <textarea

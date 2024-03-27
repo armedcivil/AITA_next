@@ -15,7 +15,7 @@ import PositionSwitchCamera from '@/app/ui/three/position-switch-camera';
 import { Select, SelectMethod } from '@/app/ui/three/select';
 
 export interface SceneMethod {
-  reset: () => void;
+  resetCamera: () => void;
   toJSON: () => object;
   restore: (json: object) => void;
 }
@@ -49,8 +49,7 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
   const loader = new THREE.ObjectLoader();
 
   useImperativeHandle(ref, () => ({
-    // TODO: resetCamera に変更
-    reset() {
+    resetCamera() {
       (scene as any).cameraControls.reset(true);
     },
     toJSON() {
