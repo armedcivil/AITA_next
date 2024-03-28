@@ -18,6 +18,7 @@ export interface SelectMethod {
   attach: (object: THREE.Object3D) => void;
   toJSON: () => object;
   clear: () => void;
+  position: () => THREE.Vector3;
 }
 
 // Select コンポーネントの宣言
@@ -86,6 +87,9 @@ export const Select = forwardRef(function Select(
         .concat()
         .forEach((child) => child.removeFromParent());
       dispatch({});
+    },
+    position() {
+      return groupRef.current?.position;
     },
   }));
 

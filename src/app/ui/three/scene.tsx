@@ -36,7 +36,7 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
         color: value[3],
         format: THREE.RGBAFormat,
       });
-      const geometory = new THREE.BoxGeometry(1, 1, 1);
+      const geometory = new THREE.ConeGeometry(1, 1, 3, 1);
       const mesh = new THREE.Mesh(geometory, material);
       mesh.layers.enable(2);
       mesh.position.set(Number(value[0]), Number(value[1]), Number(value[2]));
@@ -52,7 +52,6 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
 
   const loader = new THREE.ObjectLoader();
 
-  // TODO: TransformControls の mode 切り換え用メソッドの実装
   useImperativeHandle(ref, () => ({
     resetCamera() {
       (scene as any).cameraControls.reset(true);
@@ -125,9 +124,7 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
   const calculateGroupCenter = (objectArray: THREE.Object3D[]) => {
     return objectArray
       .map((object) => {
-        const world = new THREE.Vector3();
-        object.getWorldPosition(world);
-        return world;
+        return object.getWorldPosition(new THREE.Vector3());
       })
       .reduce(
         (pre, cur, ind, arr) => {
@@ -137,19 +134,19 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
       );
   };
 
-  // TODO: attach されるときに group の角度のことを考えられていない
   const attachObjectsToSelectedGroup = (
     objectArray: THREE.Object3D[],
     groupCenter: THREE.Vector3,
+    groupQuaternion: THREE.Quaternion,
   ) => {
     objectArray.forEach((object) => {
       if (object.type === 'Mesh') {
         highlight(object as THREE.Mesh);
       }
-      const world = new THREE.Vector3();
-      object.getWorldPosition(world);
-      const local = world.sub(groupCenter);
+      const world = object.getWorldPosition(new THREE.Vector3()).clone();
+      const local = world.sub(groupCenter.clone());
       selectedGroup.current?.attach(object);
+      object.applyQuaternion(groupQuaternion.clone());
       object.position.set(local.x, local.y, local.z);
     });
   };
@@ -163,7 +160,10 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
         if (object.type === 'Mesh') {
           unhighlight(object as THREE.Mesh);
         }
+        const world = object.getWorldPosition(new THREE.Vector3()).clone();
+        const local = world.sub(selectRef.current!.position().clone());
         selectRef.current?.attach(object);
+        object.position.set(local.x, local.y, local.z);
       });
   };
 
@@ -189,11 +189,19 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
           (scene as any).cameraControls.enabled = true;
         }}
         onSelectionChange={(objectArray) => {
+          const groupQuaternion = selectedGroup.current!.quaternion.clone();
           const groupCenter = calculateGroupCenter(objectArray);
-          attachObjectsToSelectedGroup(objectArray, groupCenter);
+          attachObjectsToSelectedGroup(
+            objectArray,
+            groupCenter,
+            groupQuaternion,
+          );
           attachObjectsToSelectGroup(objectArray);
 
           if (selectedGroup.current) {
+            selectedGroup.current.applyQuaternion(
+              groupQuaternion.clone().invert(),
+            );
             selectedGroup.current.position.set(
               groupCenter.x,
               groupCenter.y,
@@ -213,6 +221,8 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
         showZ={transformMode !== 'rotate'}
         enabled={isEditMode}
         mode={transformMode}
+        rotationSnap={Math.PI / 36}
+        translationSnap={0.05}
       />
 
       <gridHelper args={[200, 20]} />
