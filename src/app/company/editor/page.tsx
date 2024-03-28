@@ -16,6 +16,7 @@ export default function Page() {
         <div className="h-[400px] w-[600px]">
           <Canvas
             className="bg-gray-300"
+            flat
             camera={{
               fov: 75,
               near: 0.1,
@@ -46,6 +47,33 @@ export default function Page() {
               onClick={() => sceneRef.current!.changeTransformMode('rotate')}
             >
               rotate
+            </button>
+            <div className="flex flex-row justify-center">
+              <button
+                className="mx-3"
+                onClick={() => sceneRef.current!.loadModel('/models/chair.glb')}
+              >
+                load chair
+              </button>
+              <button
+                className="mx-3"
+                onClick={() =>
+                  sceneRef.current!.loadModel('/models/circle-desk.glb')
+                }
+              >
+                load circle desk
+              </button>
+              <button
+                className="mx-3"
+                onClick={() =>
+                  sceneRef.current!.loadModel('/models/square-desk.glb')
+                }
+              >
+                load square desk
+              </button>
+            </div>
+            <button onClick={() => sceneRef.current!.removeSelected()}>
+              remove selected
             </button>
           </div>
 

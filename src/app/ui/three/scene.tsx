@@ -1,7 +1,10 @@
 'use client';
 
 import { useFrame, useThree } from '@/app/lib/three/three-fiber-exporter';
-import { TransformControls } from '@/app/lib/three/three-drei-exporter';
+import {
+  useGLTF,
+  TransformControls,
+} from '@/app/lib/three/three-drei-exporter';
 import * as THREE from 'three';
 import React, {
   useEffect,
@@ -13,36 +16,22 @@ import React, {
 import CanvasSetting from '@/app/ui/three/canvas-setting';
 import PositionSwitchCamera from '@/app/ui/three/position-switch-camera';
 import { Select, SelectMethod } from '@/app/ui/three/select';
+import { loadGLTF } from '../../lib/three/gltf-loader';
 
 export interface SceneMethod {
   resetCamera: () => void;
   toJSON: () => object;
   restore: (json: object) => void;
   changeTransformMode: (mode: 'translate' | 'rotate') => void;
+  loadModel: (path: string) => void;
+  removeSelected: () => void;
 }
 
 const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
   const scene = useThree((state) => state.scene);
   const renderer = useThree((state) => state.gl);
   const [initialized, setInitialized] = useState(false);
-  const [allObject, setAllObject] = useState<THREE.Object3D[]>(
-    [
-      [-1.5, 0.5, 0, '#ffaaaa'],
-      [-1.5, 0.5, -1.5, '#ffbbaa'],
-      [1.5, 0.5, 0, '#aaaaff'],
-      [1.5, 0.5, 1.5, '#aabbff'],
-    ].map((value) => {
-      const material = new THREE.MeshStandardMaterial({
-        color: value[3],
-        format: THREE.RGBAFormat,
-      });
-      const geometory = new THREE.ConeGeometry(1, 1, 3, 1);
-      const mesh = new THREE.Mesh(geometory, material);
-      mesh.layers.enable(2);
-      mesh.position.set(Number(value[0]), Number(value[1]), Number(value[2]));
-      return mesh;
-    }),
-  );
+  const [allObject, setAllObject] = useState<THREE.Object3D[]>([]);
   const [transformMode, setTransformMode] = useState<'translate' | 'rotate'>(
     'translate',
   );
@@ -74,6 +63,16 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
     },
     changeTransformMode(mode: 'translate' | 'rotate') {
       setTransformMode(mode);
+    },
+    async loadModel(path: string) {
+      const gltfModel = await loadGLTF(path);
+      gltfModel.layers.enable(2);
+      setAllObject([...allObject, gltfModel]);
+      selectRef.current?.attach(gltfModel);
+    },
+    removeSelected() {
+      selectRef.current?.removeSelected();
+      selectedGroup.current?.clear();
     },
   }));
 

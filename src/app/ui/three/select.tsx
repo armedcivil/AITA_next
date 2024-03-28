@@ -19,6 +19,7 @@ export interface SelectMethod {
   toJSON: () => object;
   clear: () => void;
   position: () => THREE.Vector3;
+  removeSelected: () => void;
 }
 
 // Select コンポーネントの宣言
@@ -85,11 +86,16 @@ export const Select = forwardRef(function Select(
       groupRef.current?.children
         .filter((child) => child.layers.isEnabled(2))
         .concat()
-        .forEach((child) => child.removeFromParent());
+        .forEach((child) => {
+          child.removeFromParent();
+        });
       dispatch({});
     },
     position() {
       return groupRef.current?.position;
+    },
+    removeSelected() {
+      dispatch({});
     },
   }));
 
