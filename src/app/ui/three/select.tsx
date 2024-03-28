@@ -69,6 +69,7 @@ export const Select = forwardRef(function Select(
     [],
   );
 
+  // TODO: toJSON は Select の役割から逸脱しているため、children を返すだけにする
   // Select コンポーネントが持つメソッドの宣言
   useImperativeHandle(selectRef, () => ({
     add(object: THREE.Object3D) {

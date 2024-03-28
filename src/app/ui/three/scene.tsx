@@ -41,6 +41,8 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
 
   const loader = new THREE.ObjectLoader();
 
+  // TODO: toJSON の仕様変更。Select には JSON の吐き出し機能を持たせない。
+  // TODO: THREE の JSON 吐き出しだと geometry のデータもまること持っているので、position, rotation, scale とリソースリストのみ持つように修正
   // TODO: 選択したオブジェクトの複製機能
   useImperativeHandle(ref, () => ({
     resetCamera() {
