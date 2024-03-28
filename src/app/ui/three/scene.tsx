@@ -41,6 +41,7 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
 
   const loader = new THREE.ObjectLoader();
 
+  // TODO: 選択したオブジェクトの複製機能
   useImperativeHandle(ref, () => ({
     resetCamera() {
       (scene as any).cameraControls.reset(true);
@@ -64,6 +65,8 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
     changeTransformMode(mode: 'translate' | 'rotate') {
       setTransformMode(mode);
     },
+    // TODO: Texture, Material, Animation 等々も読み込めるように
+    // TODO: 机・椅子の区別が付けられるように userData に識別子を作る
     async loadModel(path: string) {
       const gltfModel = await loadGLTF(path);
       gltfModel.layers.enable(2);

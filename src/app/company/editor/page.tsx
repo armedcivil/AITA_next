@@ -10,6 +10,13 @@ export default function Page() {
   const sceneRef = useRef<SceneMethod | null>(null);
   const [json, setJson] = useState<object>({});
 
+  // TODO: フロアの追加・削除・切替が出来る様に
+  // TODO: 操作の UI を作る(マウス操作で出来ることの説明含む)
+  // TODO: localStore への一時保存機能(定期実行＆手動実行)
+  // TODO: シーンの情報のアップロード
+  // TODO: モデルのTexture, Material, Animation の読み込み機能
+  // TODO: カスタムなモデルの読み込み機能
+  // TODO: カスタムなモデルに対してScaleの調整機能が必要になるかも
   return (
     <div>
       <div className="flex justify-center">
