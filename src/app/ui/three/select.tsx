@@ -16,7 +16,7 @@ import { useThree } from '@react-three/fiber';
 export interface SelectMethod {
   add: (objects: THREE.Object3D) => void;
   attach: (object: THREE.Object3D) => void;
-  toJSON: () => object;
+  children: () => THREE.Object3D[];
   clear: () => void;
   position: () => THREE.Vector3;
   removeSelected: () => void;
@@ -69,7 +69,6 @@ export const Select = forwardRef(function Select(
     [],
   );
 
-  // TODO: toJSON は Select の役割から逸脱しているため、children を返すだけにする
   // Select コンポーネントが持つメソッドの宣言
   useImperativeHandle(selectRef, () => ({
     add(object: THREE.Object3D) {
@@ -78,10 +77,8 @@ export const Select = forwardRef(function Select(
     attach(object: THREE.Object3D) {
       groupRef.current?.attach(object);
     },
-    toJSON() {
-      return groupRef.current?.children
-        .filter((child) => child.layers.isEnabled(2))
-        .map((child) => child.toJSON());
+    children() {
+      return groupRef.current?.children;
     },
     clear() {
       groupRef.current?.children

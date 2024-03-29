@@ -16,7 +16,12 @@ import React, {
 import CanvasSetting from '@/app/ui/three/canvas-setting';
 import PositionSwitchCamera from '@/app/ui/three/position-switch-camera';
 import { Select, SelectMethod } from '@/app/ui/three/select';
-import { loadGLTF } from '../../lib/three/gltf-loader';
+import {
+  loadGLTF,
+  restore,
+  save,
+  SceneObject,
+} from '@/app/lib/three/scene-store';
 
 export interface SceneMethod {
   resetCamera: () => void;
@@ -41,7 +46,6 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
 
   const loader = new THREE.ObjectLoader();
 
-  // TODO: toJSON の仕様変更。Select には JSON の吐き出し機能を持たせない。
   // TODO: THREE の JSON 吐き出しだと geometry のデータもまること持っているので、position, rotation, scale とリソースリストのみ持つように修正
   // TODO: 選択したオブジェクトの複製機能
   useImperativeHandle(ref, () => ({
@@ -50,28 +54,26 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
     },
     toJSON() {
       attachObjectsToSelectGroup([]);
-      return { objects: selectRef.current?.toJSON() };
+      return {
+        objects: save(
+          selectRef
+            .current!.children()
+            .filter((child) => child.layers.isEnabled(2)),
+        ),
+      };
     },
-    restore(json: object) {
+    async restore(json: { objects: SceneObject[] }) {
       selectRef.current?.clear();
       selectedGroup.current?.clear();
-      let object3Ds: THREE.Object3D[] = [];
-      if ((json as any).objects) {
-        object3Ds = ((json as any).objects as THREE.Object3D[]).map((value) => {
-          return loader.parse(value);
-        });
-      }
-      setAllObject(object3Ds);
+      setAllObject(await restore(json.objects));
       setInitialized(false);
     },
     changeTransformMode(mode: 'translate' | 'rotate') {
       setTransformMode(mode);
     },
-    // TODO: Texture, Material, Animation 等々も読み込めるように
     // TODO: 机・椅子の区別が付けられるように userData に識別子を作る
     async loadModel(path: string) {
       const gltfModel = await loadGLTF(path);
-      gltfModel.layers.enable(2);
       setAllObject([...allObject, gltfModel]);
       selectRef.current?.attach(gltfModel);
     },

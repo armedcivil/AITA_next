@@ -78,6 +78,14 @@ export default function Page() {
               >
                 load square desk
               </button>
+              <button
+                className="mx-3"
+                onClick={() =>
+                  sceneRef.current!.loadModel('/models/scaled-square-desk.glb')
+                }
+              >
+                load scaled square desk
+              </button>
             </div>
             <button onClick={() => sceneRef.current!.removeSelected()}>
               remove selected
