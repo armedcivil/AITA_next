@@ -10,8 +10,6 @@ import React, {
   useState,
   useRef,
 } from 'react';
-import CanvasSetting from '@/app/ui/three/canvas-setting';
-import PositionSwitchCamera from '@/app/ui/three/position-switch-camera';
 import { Select, SelectMethod } from '@/app/ui/three/select';
 import {
   loadGLTF,
@@ -83,7 +81,7 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
     },
   }));
 
-  // ブラウザの負荷を下げるために WebGL のcontextを強制的に消すことがあるため、復帰処理を仕込む
+  // ブラウザの負荷を下げるために WebGL のcontextが強制的に消されることがあるため、復帰処理を仕込む
   useEffect(() => {
     const canvas = renderer.domElement;
     const handler = (e: any) => {
@@ -208,17 +206,6 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
   // コンポーネントが返す JSX
   return (
     <>
-      <CanvasSetting />
-      <ambientLight intensity={0.1} />
-      <directionalLight
-        color="white"
-        position={[0, 5, 0]}
-        rotation={[-(Math.PI / 2), 0, 0]}
-      />
-
-      {/* FIXME: 原因は不明だが、何かのタイミングでカメラの移動が出来なくなる。怪しいのは (scene as any).cameraControls で直接アクセスしている箇所 */}
-      <PositionSwitchCamera isEditMode={isEditMode} />
-
       <Select
         ref={selectRef}
         isEditMode={isEditMode}

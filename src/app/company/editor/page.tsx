@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import Scene, { SceneMethod } from '@/app/ui/three/scene';
-import { Canvas, useThree } from '@/app/lib/three/three-fiber-exporter';
-import * as THREE from 'three';
+import { Canvas } from '@/app/lib/three/three-fiber-exporter';
+import CanvasSetting from '@/app/ui/three/canvas-setting';
+import PositionSwitchCamera from '@/app/ui/three/position-switch-camera';
 
 export default function Page() {
   const [isEditMode, setEditMode] = useState(true);
@@ -14,9 +15,7 @@ export default function Page() {
   // TODO: 操作の UI を作る(マウス操作で出来ることの説明含む)
   // TODO: localStore への一時保存機能(定期実行＆手動実行)
   // TODO: シーンの情報のアップロード
-  // TODO: モデルのTexture, Material, Animation の読み込み機能
   // TODO: カスタムなモデルの読み込み機能
-  // TODO: カスタムなモデルに対してScaleの調整機能が必要になるかも
   return (
     <div>
       <div className="flex justify-center">
@@ -32,6 +31,16 @@ export default function Page() {
               rotation: [-(Math.PI / 2), 0, 0],
             }}
           >
+            <CanvasSetting />
+            <directionalLight
+              color="white"
+              position={[0, 5, 0]}
+              rotation={[-(Math.PI / 2), 0, 0]}
+            />
+
+            {/* FIXME: 原因は不明だが、何かのタイミングでカメラの移動が出来なくなる。怪しいのは (scene as any).cameraControls で直接アクセスしている箇所 */}
+            <PositionSwitchCamera isEditMode={isEditMode} />
+
             <Scene isEditMode={isEditMode} ref={sceneRef} />
           </Canvas>
           <div className="flex flex-col">
