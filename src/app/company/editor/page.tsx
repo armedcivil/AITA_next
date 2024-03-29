@@ -90,6 +90,9 @@ export default function Page() {
             <button onClick={() => sceneRef.current!.removeSelected()}>
               remove selected
             </button>
+            <button onClick={() => sceneRef.current!.cloneSelected()}>
+              clone selected
+            </button>
           </div>
 
           <textarea

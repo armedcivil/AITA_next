@@ -20,7 +20,6 @@ export const restore = async (
     sceneObjects.map(async (sceneObject) => {
       const gltfModel = await loadGLTF(sceneObject.modelPath);
       const originalScale = gltfModel.scale.clone();
-      console.log(originalScale);
       gltfModel.applyMatrix4(sceneObject.matrix);
       gltfModel.scale.set(originalScale.x, originalScale.y, originalScale.z);
       return gltfModel;

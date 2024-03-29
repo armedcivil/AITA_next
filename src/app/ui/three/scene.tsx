@@ -30,6 +30,7 @@ export interface SceneMethod {
   changeTransformMode: (mode: 'translate' | 'rotate') => void;
   loadModel: (path: string) => void;
   removeSelected: () => void;
+  cloneSelected: () => void;
 }
 
 const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
@@ -46,8 +47,6 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
 
   const loader = new THREE.ObjectLoader();
 
-  // TODO: THREE の JSON 吐き出しだと geometry のデータもまること持っているので、position, rotation, scale とリソースリストのみ持つように修正
-  // TODO: 選択したオブジェクトの複製機能
   useImperativeHandle(ref, () => ({
     resetCamera() {
       (scene as any).cameraControls.reset(true);
@@ -80,6 +79,9 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
     removeSelected() {
       selectRef.current?.removeSelected();
       selectedGroup.current?.clear();
+    },
+    cloneSelected() {
+      clone(selectedGroup.current?.children);
     },
   }));
 
@@ -173,6 +175,28 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
       });
   };
 
+  // FIXME: Clone した物だと透明にならない
+  const clone = (selectedObjects: THREE.Object3D[] | undefined) => {
+    if (!selectedObjects) {
+      return;
+    }
+    const clonedObjects = selectedObjects.map((object) => {
+      const cloned = object.clone() as THREE.Mesh;
+      if (Array.isArray(cloned.material)) {
+        const clonedMaterials = (cloned.material as THREE.Material[]).map(
+          (mat) => mat.clone(),
+        );
+        cloned.material = clonedMaterials;
+      } else {
+        cloned.material = cloned.material.clone();
+      }
+      return cloned;
+    });
+    attachObjectsToSelectGroup([]);
+    clonedObjects.forEach((object) => selectedGroup.current?.attach(object));
+    setAllObject([...allObject, ...clonedObjects]);
+  };
+
   return (
     <>
       <CanvasSetting />
@@ -183,6 +207,7 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
         rotation={[-(Math.PI / 2), 0, 0]}
       />
 
+      {/* FIXME: 原因は不明だが、何かのタイミングでカメラの移動が出来なくなる。怪しいのは (scene as any).cameraControls で直接アクセスしている箇所 */}
       <PositionSwitchCamera isEditMode={isEditMode} />
 
       <Select
