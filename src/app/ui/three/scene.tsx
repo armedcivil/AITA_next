@@ -23,6 +23,7 @@ import {
   SceneObject,
 } from '@/app/lib/three/scene-store';
 
+// Scene コンポーネントのメソッド宣言
 export interface SceneMethod {
   resetCamera: () => void;
   toJSON: () => object;
@@ -33,6 +34,7 @@ export interface SceneMethod {
   cloneSelected: () => void;
 }
 
+// Scene コンポーネント
 const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
   const scene = useThree((state) => state.scene);
   const renderer = useThree((state) => state.gl);
@@ -47,6 +49,7 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
 
   const loader = new THREE.ObjectLoader();
 
+  // Scene コンポーネントの呼び出し可能なメソッドの定義
   useImperativeHandle(ref, () => ({
     resetCamera() {
       (scene as any).cameraControls.reset(true);
@@ -85,6 +88,7 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
     },
   }));
 
+  // ブラウザの負荷を下げるために WebGL のcontextを強制的に消すことがあるため、復帰処理を仕込む
   useEffect(() => {
     const canvas = renderer.domElement;
     const handler = (e: any) => {
@@ -98,6 +102,7 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
     };
   }, [renderer]);
 
+  // シーンの初期化。restore メソッドが呼ばれて再レンダリングされたときに実行される
   useEffect(() => {
     if (!initialized) {
       allObject.forEach((value: THREE.Object3D) => {
@@ -107,6 +112,7 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
     }
   }, [allObject, initialized]);
 
+  // 選択したオブジェクトのハイライト処理
   const highlight = (mesh: THREE.Mesh) => {
     const setting = { transparent: true, opacity: 0.5, alphaTest: 0.5 };
     if (Array.isArray(mesh.material)) {
@@ -118,6 +124,7 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
     }
   };
 
+  // 選択したオブジェクトのハイライト解除処理
   const unhighlight = (mesh: THREE.Mesh) => {
     const setting = { transparent: false, opacity: 1 };
     if (Array.isArray(mesh.material)) {
@@ -129,6 +136,7 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
     }
   };
 
+  // 選択されたオブジェクトたちの重心算出処理
   const calculateGroupCenter = (objectArray: THREE.Object3D[]) => {
     return objectArray
       .map((object) => {
@@ -142,6 +150,9 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
       );
   };
 
+  // 選択されたオブジェクトを選択中 group に移動する処理
+  // groupCenter を元に local position の算出をしている
+  // groupQuaternion を各オブジェクトにも適用することで world 座標系での回転が変更されないようにしている
   const attachObjectsToSelectedGroup = (
     objectArray: THREE.Object3D[],
     groupCenter: THREE.Vector3,
@@ -159,6 +170,7 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
     });
   };
 
+  // 選択されていたオブジェクトの選択状態を解除する処理
   const attachObjectsToSelectGroup = (objectArray: THREE.Object3D[]) => {
     selectedGroup
       .current!.children.filter(
@@ -176,6 +188,7 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
   };
 
   // FIXME: Clone した物だと透明にならない
+  // オブジェクトの複製処理
   const clone = (selectedObjects: THREE.Object3D[] | undefined) => {
     if (!selectedObjects) {
       return;
@@ -197,6 +210,7 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
     setAllObject([...allObject, ...clonedObjects]);
   };
 
+  // コンポーネントが返す JSX
   return (
     <>
       <CanvasSetting />
