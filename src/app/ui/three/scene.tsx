@@ -1,10 +1,7 @@
 'use client';
 
-import { useFrame, useThree } from '@/app/lib/three/three-fiber-exporter';
-import {
-  useGLTF,
-  TransformControls,
-} from '@/app/lib/three/three-drei-exporter';
+import { useThree } from '@/app/lib/three/three-fiber-exporter';
+import { TransformControls } from '@/app/lib/three/three-drei-exporter';
 import * as THREE from 'three';
 import React, {
   useEffect,
@@ -47,8 +44,6 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
   const selectedGroup = useRef<THREE.Group<THREE.Object3DEventMap>>(null);
   const selectRef = useRef<SelectMethod>(null);
 
-  const loader = new THREE.ObjectLoader();
-
   // Scene コンポーネントの呼び出し可能なメソッドの定義
   useImperativeHandle(ref, () => ({
     resetCamera() {
@@ -73,7 +68,7 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
     changeTransformMode(mode: 'translate' | 'rotate') {
       setTransformMode(mode);
     },
-    // TODO: 机・椅子の区別が付けられるように userData に識別子を作る
+    // TODO: 机・椅子の区別が付けられるように userData に type プロパティをつける
     async loadModel(path: string) {
       const gltfModel = await loadGLTF(path);
       setAllObject([...allObject, gltfModel]);
