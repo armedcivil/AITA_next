@@ -6,10 +6,15 @@ export type SceneObject = {
   matrix: THREE.Matrix4;
 };
 
+export type Floor = {
+  label: string;
+  objects: SceneObject[];
+};
+
 export const save = (objects: THREE.Object3D[]): SceneObject[] => {
   return objects.map((object) => ({
     modelPath: object.userData.modelPath,
-    matrix: object.matrix,
+    matrix: object.matrixWorld,
   }));
 };
 

@@ -22,7 +22,11 @@
         "pattern": "Ready in \\d+\\.\\ds",
         "uriFormat": "http://localhost:5000",
         "action": "debugWithChrome"
-      }
+      },
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ]
     }
   ]
 }

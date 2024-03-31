@@ -12,6 +12,7 @@ import React, {
 } from 'react';
 import { Select, SelectMethod } from '@/app/ui/three/select';
 import {
+  Floor,
   loadGLTF,
   restore,
   save,
@@ -21,8 +22,8 @@ import {
 // Scene コンポーネントのメソッド宣言
 export interface SceneMethod {
   resetCamera: () => void;
-  toJSON: () => object;
-  restore: (json: object) => void;
+  toJSON: () => Floor;
+  restore: (json: Floor) => void;
   changeTransformMode: (mode: 'translate' | 'rotate') => void;
   loadModel: (path: string) => void;
   removeSelected: () => void;
@@ -30,7 +31,16 @@ export interface SceneMethod {
 }
 
 // Scene コンポーネント
-const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
+const Scene = (
+  {
+    isEditMode,
+    onChange,
+  }: {
+    isEditMode: boolean;
+    onChange?: (result: { objects: SceneObject[] }) => void;
+  },
+  ref: any,
+) => {
   const scene = useThree((state) => state.scene);
   const renderer = useThree((state) => state.gl);
   const [initialized, setInitialized] = useState(false);
@@ -42,21 +52,30 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
   const selectedGroup = useRef<THREE.Group<THREE.Object3DEventMap>>(null);
   const selectRef = useRef<SelectMethod>(null);
 
+  // Scene の状態を JSON 化する
+  const toJSON = (): { objects: SceneObject[] } => {
+    const selectedObjects = selectedGroup.current!.children.map((object) => {
+      object.updateMatrix();
+      object.updateMatrixWorld();
+      return object;
+    });
+    const result = {
+      objects: save([
+        ...selectRef
+          .current!.children()
+          .filter((child) => child.layers.isEnabled(2)),
+        ...selectedObjects,
+      ]),
+    };
+    return result;
+  };
+
   // Scene コンポーネントの呼び出し可能なメソッドの定義
   useImperativeHandle(ref, () => ({
     resetCamera() {
       (scene as any).cameraControls.reset(true);
     },
-    toJSON() {
-      attachObjectsToSelectGroup([]);
-      return {
-        objects: save(
-          selectRef
-            .current!.children()
-            .filter((child) => child.layers.isEnabled(2)),
-        ),
-      };
-    },
+    toJSON,
     async restore(json: { objects: SceneObject[] }) {
       selectRef.current?.clear();
       selectedGroup.current?.clear();
@@ -71,6 +90,7 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
       const gltfModel = await loadGLTF(path);
       setAllObject([...allObject, gltfModel]);
       selectRef.current?.attach(gltfModel);
+      onChange?.(toJSON());
     },
     removeSelected() {
       selectRef.current?.removeSelected();
@@ -201,6 +221,7 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
     attachObjectsToSelectGroup([]);
     clonedObjects.forEach((object) => selectedGroup.current?.attach(object));
     setAllObject([...allObject, ...clonedObjects]);
+    onChange?.(toJSON());
   };
 
   // コンポーネントが返す JSX
@@ -250,6 +271,9 @@ const Scene = ({ isEditMode }: { isEditMode: boolean }, ref: any) => {
         mode={transformMode}
         rotationSnap={Math.PI / 36}
         translationSnap={0.05}
+        onObjectChange={() => {
+          onChange?.(toJSON());
+        }}
       />
 
       <gridHelper args={[200, 20]} />

@@ -4,6 +4,7 @@ import { TrashIcon } from '@heroicons/react/24/outline';
 import { deleteUser } from '../lib/actions';
 import { useFormState } from 'react-dom';
 
+// TODO: モーダル出して削除前に確認
 export function DeleteUserButton({
   accessToken,
   userId,
