@@ -19,7 +19,8 @@ export interface SelectMethod {
   children: () => THREE.Object3D[];
   clear: () => void;
   position: () => THREE.Vector3;
-  removeSelected: () => void;
+  clearCache: () => void;
+  selectAll: () => void;
 }
 
 // Select コンポーネントの宣言
@@ -92,8 +93,16 @@ export const Select = forwardRef(function Select(
     position() {
       return groupRef.current?.position;
     },
-    removeSelected() {
+    clearCache() {
       dispatch({});
+    },
+    selectAll() {
+      const notSelected = groupRef.current!.children.filter(
+        (child) => child.layers.isEnabled(2), // 選択機能の対象のオブジェクトで未選択のオブジェクト
+      );
+      dispatch({
+        object: [...notSelected, ...selected],
+      });
     },
   }));
 

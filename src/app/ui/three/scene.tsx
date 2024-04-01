@@ -93,7 +93,7 @@ const Scene = (
       onChange?.(toJSON());
     },
     removeSelected() {
-      selectRef.current?.removeSelected();
+      selectRef.current?.clearCache();
       selectedGroup.current?.clear();
     },
     cloneSelected() {
@@ -124,6 +124,23 @@ const Scene = (
       setInitialized(true);
     }
   }, [allObject, initialized]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.metaKey) {
+        if (e.key === 'a') {
+          e.preventDefault();
+          selectRef.current?.selectAll();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  });
 
   // 選択したオブジェクトのハイライト処理
   const highlight = (mesh: THREE.Mesh) => {
@@ -184,10 +201,10 @@ const Scene = (
   };
 
   // 選択されていたオブジェクトの選択状態を解除する処理
-  const attachObjectsToSelectGroup = (objectArray: THREE.Object3D[]) => {
+  const attachObjectsToSelectGroup = (selectedObjects: THREE.Object3D[]) => {
     selectedGroup
       .current!.children.filter(
-        (object: THREE.Object3D) => objectArray.indexOf(object) === -1,
+        (object: THREE.Object3D) => selectedObjects.indexOf(object) === -1,
       )
       .forEach((object: THREE.Object3D) => {
         if (object.type === 'Mesh') {

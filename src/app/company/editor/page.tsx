@@ -54,7 +54,7 @@ export default function Page() {
   );
   const newFloorName = useRef<HTMLInputElement>(null);
 
-  // TODO: フロアの追加・削除・切替が出来る様に
+  // TODO: キーボード操作で全選択・クリップボードへコピー・クリップボードからペーストを出来るようにする
   // TODO: 操作の UI を作る(マウス操作で出来ることの説明含む)
   // TODO: localStore への一時保存機能(定期実行＆手動実行)
   // TODO: シーンの情報のアップロード
