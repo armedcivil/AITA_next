@@ -6,17 +6,13 @@ import { Canvas } from '@/app/lib/three/three-fiber-exporter';
 import CanvasSetting from '@/app/ui/three/canvas-setting';
 import PositionSwitchCamera from '@/app/ui/three/position-switch-camera';
 import { Button } from '@/app/ui/button';
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  PlusIcon,
-} from '@heroicons/react/24/outline';
+import { PlusIcon } from '@heroicons/react/24/outline';
 import { Floor } from '@/app/lib/three/scene-store';
-import clsx from 'clsx';
+import SelectFloorSideBar from '@/app/ui/select-floor-sidebar';
 
 interface DeleteAction {
   action: 'delete';
-  index: number;
+  floor: Floor;
 }
 
 interface CreateAction {
@@ -45,15 +41,18 @@ export default function Page() {
           return [...state, { label: args.label, objects: [] }];
         case 'update':
           state[args.index] = args.floor;
-          return state;
+          return [...state];
         case 'delete':
-          return state.splice(args.index, 1);
+          const deleteIndex = state.indexOf(args.floor);
+          if (deleteIndex > -1) {
+            state.splice(deleteIndex, 1);
+          }
+          return [...state];
       }
     },
     [],
   );
   const newFloorName = useRef<HTMLInputElement>(null);
-  const [isOpenFloorSelect, setIsOpenFloorSelect] = useState(true);
 
   // TODO: フロアの追加・削除・切替が出来る様に
   // TODO: 操作の UI を作る(マウス操作で出来ることの説明含む)
@@ -120,58 +119,29 @@ export default function Page() {
             />
           </Canvas>
           {currentFloorIndex !== null ? undefined : (
-            <div className="absolute left-0 top-0 h-[400px] w-[600px] cursor-not-allowed bg-white opacity-80"></div>
+            <div className="absolute left-0 top-0 h-[400px] w-[600px] cursor-not-allowed bg-black opacity-80"></div>
           )}
           {currentFloorIndex !== null && (
-            <span className="absolute left-2 top-0">
+            <span className="whitespace-no-wrap absolute left-2 top-0 max-w-48 overflow-hidden text-ellipsis">
               {floors[currentFloorIndex].label}
             </span>
           )}
-          <div className="absolute bottom-0 left-0 top-9 flex w-64 w-64 flex-row">
-            <div
-              className={clsx('relative w-56 rounded-r-lg bg-white p-3', {
-                'w-0 p-0': !isOpenFloorSelect,
-              })}
-            >
-              <div
-                className={clsx('whitespace-no-wrap text-xl', {
-                  'w-0': !isOpenFloorSelect,
-                })}
-              >
-                {isOpenFloorSelect && 'Select floor'}
-              </div>
-              <hr></hr>
-              <div className="absolute bottom-0 bottom-0 left-0 right-0 top-12 overflow-y-auto">
-                <div>
-                  {floors.map((floor, index) => (
-                    <div
-                      key={index}
-                      className="whitespace-no-wrap bg-white p-2 hover:bg-red-200"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setCurrentFloorIndex(index);
-                        sceneRef.current?.restore(floor);
-                      }}
-                    >
-                      {floor.label}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-            <div
-              className="mt-8 flex h-9 w-8 items-center justify-center rounded-r-lg bg-white shadow-xl"
-              onClick={(e) => {
-                setIsOpenFloorSelect(!isOpenFloorSelect);
-              }}
-            >
-              {isOpenFloorSelect ? (
-                <ChevronLeftIcon className="h-5" />
-              ) : (
-                <ChevronRightIcon className="h-5" />
-              )}
-            </div>
-          </div>
+          <SelectFloorSideBar
+            floors={floors}
+            onSelect={(floor, index) => {
+              setCurrentFloorIndex(index);
+              sceneRef.current?.restore(floor);
+            }}
+            onDelete={(floor, index) => {
+              if (currentFloorIndex === index) {
+                setCurrentFloorIndex(null);
+              }
+              dispatch({ action: 'delete', floor });
+            }}
+            onLabelChange={(floor, index) => {
+              dispatch({ action: 'update', floor, index });
+            }}
+          />
           <div className="flex flex-col">
             <button onClick={() => setEditMode(!isEditMode)}> switch </button>
             <button onClick={() => sceneRef.current!.resetCamera()}>

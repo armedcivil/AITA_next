@@ -33,7 +33,8 @@
         "mosapride.zenkaku",
         "humao.rest-client",
         "dbaeumer.vscode-eslint",
-        "gruntfuggly.todo-tree"
+        "gruntfuggly.todo-tree",
+        "bradlc.vscode-tailwindcss"
       ]
     }
   }

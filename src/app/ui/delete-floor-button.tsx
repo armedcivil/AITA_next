@@ -14,13 +14,14 @@ export default function DeleteFloorButton({
   const [showModal, setShowModal] = useState(false);
 
   return (
-    <Button
-      className="ml-4"
-      onClick={(e) => {
-        setShowModal(true);
-      }}
-    >
-      <TrashIcon className="h-5" />
+    <>
+      <TrashIcon
+        className="h-5"
+        onClick={(e) => {
+          e.stopPropagation();
+          setShowModal(true);
+        }}
+      />
       {showModal &&
         createPortal(
           <ModalContent
@@ -29,7 +30,7 @@ export default function DeleteFloorButton({
             }}
           >
             {`Delete ${floorName}?`}
-            <div className="mt-4">
+            <div className="mt-4 flex justify-end">
               <Button
                 onClick={(e) => {
                   setShowModal(false);
@@ -42,6 +43,6 @@ export default function DeleteFloorButton({
           </ModalContent>,
           document.body,
         )}
-    </Button>
+    </>
   );
 }
