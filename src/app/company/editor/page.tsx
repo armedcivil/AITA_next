@@ -74,6 +74,7 @@ export default function Page() {
               return;
             }
             dispatch({ action: 'create', label: newFloorName.current.value });
+            newFloorName.current.value = '';
           }}
         >
           Create Floor
