@@ -19,8 +19,9 @@ export default function SelectFloorSideBar({
 
   return (
     <div
-      className={clsx('absolute bottom-0 left-0 top-9 flex w-64 flex-row', {
-        'w-0': !isOpen,
+      className={clsx('absolute bottom-0 left-0 top-9 flex flex-row', {
+        'w-64': isOpen,
+        'w-8': !isOpen,
       })}
     >
       <div

@@ -122,7 +122,7 @@ export default function Page() {
             <div className="absolute left-0 top-0 h-[400px] w-[600px] cursor-not-allowed bg-black opacity-80"></div>
           )}
           {currentFloorIndex !== null && (
-            <span className="whitespace-no-wrap absolute left-2 top-0 max-w-48 overflow-hidden text-ellipsis">
+            <span className="whitespace-no-wrap absolute left-2 top-0 max-w-48 select-none overflow-hidden text-ellipsis">
               {floors[currentFloorIndex].label}
             </span>
           )}
