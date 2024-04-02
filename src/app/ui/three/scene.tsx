@@ -73,6 +73,12 @@ const Scene = (
     return result;
   };
 
+  // 選択状態のオブジェクトを削除
+  const removeSelected = () => {
+    selectRef.current?.clearCache();
+    selectedGroup.current?.clear();
+  };
+
   // Scene コンポーネントの呼び出し可能なメソッドの定義
   useImperativeHandle(ref, () => ({
     resetCamera() {
@@ -92,10 +98,7 @@ const Scene = (
       selectRef.current?.attach(gltfModel);
       onChange?.(toJSON());
     },
-    removeSelected() {
-      selectRef.current?.clearCache();
-      selectedGroup.current?.clear();
-    },
+    removeSelected,
     cloneSelected() {
       clone(selectedGroup.current?.children);
     },
@@ -148,6 +151,9 @@ const Scene = (
           );
           setAllObject([...allObject, ...clonedObjects]);
           setInitialized(false);
+        }
+        if (e.key === 'Delete' || e.key === 'Backspace') {
+          removeSelected();
         }
       }
     };
