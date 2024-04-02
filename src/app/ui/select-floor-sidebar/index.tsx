@@ -61,7 +61,7 @@ export default function SelectFloorSideBar({
         </div>
       </div>
       <div
-        className="mt-8 flex h-9 w-8 items-center justify-center rounded-r-lg bg-white shadow-xl"
+        className="mt-7 flex h-9 w-8 items-center justify-center rounded-r-lg bg-red-400 text-white shadow-xl"
         onClick={(e) => {
           setIsOpen(!isOpen);
         }}

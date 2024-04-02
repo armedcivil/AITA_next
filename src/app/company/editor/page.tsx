@@ -6,9 +6,18 @@ import { Canvas } from '@/app/lib/three/three-fiber-exporter';
 import CanvasSetting from '@/app/ui/three/canvas-setting';
 import PositionSwitchCamera from '@/app/ui/three/position-switch-camera';
 import { Button } from '@/app/ui/button';
-import { PlusIcon } from '@heroicons/react/24/outline';
+import {
+  ArrowPathIcon,
+  PencilIcon,
+  PlusIcon,
+  VideoCameraIcon,
+} from '@heroicons/react/24/outline';
 import { Floor } from '@/app/lib/three/scene-store';
 import SelectFloorSideBar from '@/app/ui/select-floor-sidebar';
+import CircleTableIcon from '@/app/ui/icons/circle-table-icon';
+import ChairIcon from '@/app/ui/icons/chair-icon';
+import SquareDeskIcon from '@/app/ui/icons/square-desk-icon';
+import ScaledSquareDeskIcon from '@/app/ui/icons/scaled-square-desk-icon';
 
 interface DeleteAction {
   action: 'delete';
@@ -143,48 +152,60 @@ export default function Page() {
               dispatch({ action: 'update', floor, index });
             }}
           />
-          <div className="flex flex-col">
-            <button onClick={() => setEditMode(!isEditMode)}> switch </button>
-            <button onClick={() => sceneRef.current!.resetCamera()}>
-              reset camera
+          <div className="absolute right-0 top-16 flex w-8 flex-col justify-items-center rounded-l-lg bg-red-400 px-1 py-2 text-white">
+            <button
+              onClick={() => setEditMode(!isEditMode)}
+              className="flex justify-center"
+            >
+              {isEditMode ? (
+                <VideoCameraIcon
+                  className="h-5"
+                  title="Switch to preview mode"
+                />
+              ) : (
+                <PencilIcon className="h-5" title="Switch to edit mode" />
+              )}
             </button>
-            <div className="flex flex-row justify-center">
-              <button
-                className="mx-3"
-                onClick={() => sceneRef.current!.loadModel('/models/chair.glb')}
-              >
-                load chair
-              </button>
-              <button
-                className="mx-3"
-                onClick={() =>
-                  sceneRef.current!.loadModel('/models/circle-desk.glb')
-                }
-              >
-                load circle desk
-              </button>
-              <button
-                className="mx-3"
-                onClick={() =>
-                  sceneRef.current!.loadModel('/models/square-desk.glb')
-                }
-              >
-                load square desk
-              </button>
-              <button
-                className="mx-3"
-                onClick={() =>
-                  sceneRef.current!.loadModel('/models/scaled-square-desk.glb')
-                }
-              >
-                load scaled square desk
-              </button>
-            </div>
-            <button onClick={() => sceneRef.current!.removeSelected()}>
-              remove selected
+            <button
+              onClick={() => sceneRef.current!.resetCamera()}
+              className="mt-2 flex justify-center"
+            >
+              <ArrowPathIcon className="h-5" title="Reset camera position" />
             </button>
-            <button onClick={() => sceneRef.current!.cloneSelected()}>
-              clone selected
+            <hr className="mt-2" />
+            <button
+              className="mt-2 flex justify-center"
+              onClick={() => sceneRef.current!.loadModel('/models/chair.glb')}
+              title="Load 3D model of chair"
+            >
+              <ChairIcon className="h-5" fill="white" />
+            </button>
+            <button
+              className="mt-2 flex justify-center"
+              onClick={() =>
+                sceneRef.current!.loadModel('/models/circle-desk.glb')
+              }
+              title="Load 3D model of circle table"
+            >
+              <CircleTableIcon className="h-5" fill="white" />
+            </button>
+            <button
+              className="mt-2 flex justify-center"
+              onClick={() =>
+                sceneRef.current!.loadModel('/models/square-desk.glb')
+              }
+              title="Load 3D model of square table"
+            >
+              <SquareDeskIcon className="h-5" fill="white" />
+            </button>
+            <button
+              className="mt-2 flex justify-center"
+              onClick={() =>
+                sceneRef.current!.loadModel('/models/scaled-square-desk.glb')
+              }
+              title="Load 3D model of square table"
+            >
+              <ScaledSquareDeskIcon className="h-5" fill="white" />
             </button>
           </div>
         </div>
