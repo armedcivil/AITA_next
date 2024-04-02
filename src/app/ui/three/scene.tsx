@@ -1,10 +1,7 @@
 'use client';
 
-import { useThree } from '@/app/lib/three/three-fiber-exporter';
-import {
-  PivotControls,
-  TransformControls,
-} from '@/app/lib/three/three-drei-exporter';
+import { useThree, useFrame } from '@/app/lib/three/three-fiber-exporter';
+import { PivotControls } from '@/app/lib/three/three-drei-exporter';
 import * as THREE from 'three';
 import React, {
   useEffect,
@@ -45,6 +42,7 @@ const Scene = (
 ) => {
   const scene = useThree((state) => state.scene);
   const renderer = useThree((state) => state.gl);
+  const camera = useThree((state) => state.camera);
   const [initialized, setInitialized] = useState(false);
   const [allObject, setAllObject] = useState<THREE.Object3D[]>([]);
 
@@ -54,6 +52,8 @@ const Scene = (
 
   const startMatrixRef = useRef<THREE.Matrix4>();
   const pivotMatrixRef = useRef<THREE.Matrix4>(new THREE.Matrix4());
+
+  const [pivotScale, setPivotScale] = useState<number>(1);
 
   // Scene の状態を JSON 化する
   const toJSON = (): { objects: SceneObject[] } => {
@@ -163,6 +163,10 @@ const Scene = (
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
+  });
+
+  useFrame(() => {
+    setPivotScale(camera.position.clone().distanceTo(new THREE.Vector3()) / 5);
   });
 
   // 選択したオブジェクトのハイライト処理
@@ -322,6 +326,7 @@ const Scene = (
         depthTest={false}
         activeAxes={[true, false, true]}
         visible={isEditMode}
+        scale={pivotScale}
         disableScaling={true}
         onDragStart={() => {
           startMatrixRef.current = selectedGroup.current?.matrix.clone();
