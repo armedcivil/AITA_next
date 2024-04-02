@@ -113,7 +113,7 @@ export const Select = forwardRef(function Select(
   });
 
   // raycast に何も当たらなかった時のコールバック
-  const handlePointerMissed = useCallback((event: any) => {
+  const handlePointerMissed = (event: any) => {
     renderer.domElement.parentElement
       ?.querySelectorAll('.selectBox')
       .forEach((element, index, parent) => {
@@ -123,11 +123,11 @@ export const Select = forwardRef(function Select(
     if (event.shiftKey) {
       dispatch({});
     }
-  }, []);
+  };
 
   // クリックされた時のコールバック
   // event.object で raycast に当たった Object3D が取得できる
-  const handleClick = useCallback((event: any) => {
+  const handleClick = (event: any) => {
     renderer.domElement.parentElement
       ?.querySelectorAll('.selectBox')
       .forEach((element, index, parent) => {
@@ -135,7 +135,7 @@ export const Select = forwardRef(function Select(
       });
     event.stopPropagation();
     dispatch({ object: event.object, shift: event.shiftKey });
-  }, []);
+  };
 
   const windowSize = new THREE.Vector2(size.width, size.height);
   const elementStartPoint: THREE.Vector2 = new THREE.Vector2(0, 0);
