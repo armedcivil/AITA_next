@@ -119,6 +119,7 @@ export const Select = forwardRef(function Select(
       .forEach((element, index, parent) => {
         element.parentElement?.removeChild(element);
       });
+    onSelectionEnd?.();
     if (event.shiftKey) {
       dispatch({});
     }
@@ -144,8 +145,6 @@ export const Select = forwardRef(function Select(
     const element = document.createElement('div');
     element.classList.add('selectBox');
 
-    const oldControlsEnabled = (controls as any)?.enabled;
-
     function handleDragStart(event: any) {
       if (!event.shiftKey || !isEditMode) {
         return;
@@ -155,9 +154,6 @@ export const Select = forwardRef(function Select(
         -(event.offsetY / windowSize.y) * 2 + 1,
         0.3,
       );
-      if (controls) {
-        (controls as any).enabled = false;
-      }
       onSelectionStart?.();
 
       renderer.domElement.parentElement?.appendChild(element);
@@ -188,20 +184,12 @@ export const Select = forwardRef(function Select(
         (event.offsetX / windowSize.x) * 2 - 1,
         -(event.offsetY / windowSize.y) * 2 + 1,
       );
-      const distance = elementStartPoint.distanceTo(
-        new THREE.Vector2(event.clientX, event.clientY),
-      );
 
-      if (!event.shiftKey || !isEditMode || distance < 10) {
+      if (!event.shiftKey || !isEditMode) {
         element.parentElement?.removeChild(element);
         return;
       }
-      if (controls) {
-        (controls as any).enabled =
-          oldControlsEnabled !== undefined || oldControlsEnabled !== null
-            ? oldControlsEnabled
-            : true;
-      }
+
       onSelectionEnd?.();
 
       selectionBox.endPoint.set(endPoint.x, endPoint.y, 0.3);
