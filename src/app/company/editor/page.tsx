@@ -128,30 +128,6 @@ export default function Page() {
               }}
             />
           </Canvas>
-          {currentFloorIndex !== null ? undefined : (
-            <div className="absolute left-0 top-0 h-[400px] w-[600px] cursor-not-allowed bg-black opacity-80"></div>
-          )}
-          {currentFloorIndex !== null && (
-            <span className="whitespace-no-wrap absolute left-2 top-0 max-w-48 select-none overflow-hidden text-ellipsis">
-              {floors[currentFloorIndex].label}
-            </span>
-          )}
-          <SelectFloorSideBar
-            floors={floors}
-            onSelect={(floor, index) => {
-              setCurrentFloorIndex(index);
-              sceneRef.current?.restore(floor);
-            }}
-            onDelete={(floor, index) => {
-              if (currentFloorIndex === index) {
-                setCurrentFloorIndex(null);
-              }
-              dispatch({ action: 'delete', floor });
-            }}
-            onLabelChange={(floor, index) => {
-              dispatch({ action: 'update', floor, index });
-            }}
-          />
           <div className="absolute right-0 top-16 flex w-8 flex-col justify-items-center rounded-l-lg bg-red-400 px-1 py-2 text-white">
             <button
               onClick={() => setEditMode(!isEditMode)}
@@ -208,6 +184,30 @@ export default function Page() {
               <ScaledSquareDeskIcon className="h-5" fill="white" />
             </button>
           </div>
+          {currentFloorIndex !== null ? undefined : (
+            <div className="absolute left-0 top-0 h-[400px] w-[600px] cursor-not-allowed bg-black opacity-80"></div>
+          )}
+          {currentFloorIndex !== null && (
+            <span className="whitespace-no-wrap absolute left-2 top-0 max-w-48 select-none overflow-hidden text-ellipsis">
+              {floors[currentFloorIndex].label}
+            </span>
+          )}
+          <SelectFloorSideBar
+            floors={floors}
+            onSelect={(floor, index) => {
+              setCurrentFloorIndex(index);
+              sceneRef.current?.restore(floor);
+            }}
+            onDelete={(floor, index) => {
+              if (currentFloorIndex === index) {
+                setCurrentFloorIndex(null);
+              }
+              dispatch({ action: 'delete', floor });
+            }}
+            onLabelChange={(floor, index) => {
+              dispatch({ action: 'update', floor, index });
+            }}
+          />
         </div>
       </div>
     </div>

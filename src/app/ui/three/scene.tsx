@@ -264,7 +264,6 @@ const Scene = (
     });
   };
 
-  // FIXME: Clone した物だと透明にならない
   // オブジェクトの複製処理
   const clone = (selectedObjects: THREE.Object3D[] | undefined) => {
     if (!selectedObjects) {
