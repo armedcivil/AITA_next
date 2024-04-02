@@ -91,123 +91,125 @@ export default function Page() {
         </Button>
       </div>
       <div className="flex w-full justify-center">
-        <div className="relative h-[400px] w-[600px]">
-          <Canvas
-            className="bg-gray-300"
-            flat
-            camera={{
-              fov: 75,
-              near: 0.1,
-              far: 800,
-              position: [0, 5, 0],
-              rotation: [-(Math.PI / 2), 0, 0],
-            }}
-          >
-            <CanvasSetting />
-            <directionalLight
-              color="white"
-              position={[0, 5, 0]}
-              rotation={[-(Math.PI / 2), 0, 0]}
-            />
+        <div className="flex flex-col items-center rounded-lg border-2 border-gray-100 p-4 shadow-2xl">
+          <div className="relative h-[400px] w-[600px]">
+            <Canvas
+              className="bg-gray-300"
+              flat
+              camera={{
+                fov: 75,
+                near: 0.1,
+                far: 800,
+                position: [0, 5, 0],
+                rotation: [-(Math.PI / 2), 0, 0],
+              }}
+            >
+              <CanvasSetting />
+              <directionalLight
+                color="white"
+                position={[0, 5, 0]}
+                rotation={[-(Math.PI / 2), 0, 0]}
+              />
 
-            {/* FIXME: 原因は不明だが、何かのタイミングでカメラの移動が出来なくなる。怪しいのは (scene as any).cameraControls で直接アクセスしている箇所 */}
-            <PositionSwitchCamera isEditMode={isEditMode} />
+              {/* FIXME: 原因は不明だが、何かのタイミングでカメラの移動が出来なくなる。怪しいのは (scene as any).cameraControls で直接アクセスしている箇所 */}
+              <PositionSwitchCamera isEditMode={isEditMode} />
 
-            <Scene
-              isEditMode={isEditMode}
-              ref={sceneRef}
-              onChange={(result) => {
-                dispatch({
-                  action: 'update',
-                  index: currentFloorIndex!,
-                  floor: {
-                    objects: result.objects,
-                    label: floors[currentFloorIndex!].label,
-                  },
-                });
+              <Scene
+                isEditMode={isEditMode}
+                ref={sceneRef}
+                onChange={(result) => {
+                  dispatch({
+                    action: 'update',
+                    index: currentFloorIndex!,
+                    floor: {
+                      objects: result.objects,
+                      label: floors[currentFloorIndex!].label,
+                    },
+                  });
+                }}
+              />
+            </Canvas>
+            <div className="absolute right-0 top-16 flex w-8 flex-col justify-items-center rounded-l-lg bg-red-400 px-1 py-2 text-white">
+              <button
+                onClick={() => setEditMode(!isEditMode)}
+                className="flex justify-center"
+              >
+                {isEditMode ? (
+                  <VideoCameraIcon
+                    className="h-5"
+                    title="Switch to preview mode"
+                  />
+                ) : (
+                  <PencilIcon className="h-5" title="Switch to edit mode" />
+                )}
+              </button>
+              <button
+                onClick={() => sceneRef.current!.resetCamera()}
+                className="mt-2 flex justify-center"
+              >
+                <ArrowPathIcon className="h-5" title="Reset camera position" />
+              </button>
+              <hr className="mt-2" />
+              <button
+                className="mt-2 flex justify-center"
+                onClick={() => sceneRef.current!.loadModel('/models/chair.glb')}
+                title="Load 3D model of chair"
+              >
+                <ChairIcon className="h-5" fill="white" />
+              </button>
+              <button
+                className="mt-2 flex justify-center"
+                onClick={() =>
+                  sceneRef.current!.loadModel('/models/circle-desk.glb')
+                }
+                title="Load 3D model of circle table"
+              >
+                <CircleTableIcon className="h-5" fill="white" />
+              </button>
+              <button
+                className="mt-2 flex justify-center"
+                onClick={() =>
+                  sceneRef.current!.loadModel('/models/square-desk.glb')
+                }
+                title="Load 3D model of square table"
+              >
+                <SquareDeskIcon className="h-5" fill="white" />
+              </button>
+              <button
+                className="mt-2 flex justify-center"
+                onClick={() =>
+                  sceneRef.current!.loadModel('/models/scaled-square-desk.glb')
+                }
+                title="Load 3D model of square table"
+              >
+                <ScaledSquareDeskIcon className="h-5" fill="white" />
+              </button>
+            </div>
+            {currentFloorIndex !== null ? undefined : (
+              <div className="absolute left-0 top-0 h-[400px] w-[600px] cursor-not-allowed bg-black opacity-80"></div>
+            )}
+            {currentFloorIndex !== null && (
+              <span className="whitespace-no-wrap absolute left-2 top-0 max-w-48 select-none overflow-hidden text-ellipsis">
+                {floors[currentFloorIndex].label}
+              </span>
+            )}
+            <SelectFloorSideBar
+              floors={floors}
+              onSelect={(floor, index) => {
+                setCurrentFloorIndex(index);
+                sceneRef.current?.restore(floor);
+              }}
+              onDelete={(floor, index) => {
+                if (currentFloorIndex === index) {
+                  setCurrentFloorIndex(null);
+                }
+                dispatch({ action: 'delete', floor });
+              }}
+              onLabelChange={(floor, index) => {
+                dispatch({ action: 'update', floor, index });
               }}
             />
-          </Canvas>
-          <div className="absolute right-0 top-16 flex w-8 flex-col justify-items-center rounded-l-lg bg-red-400 px-1 py-2 text-white">
-            <button
-              onClick={() => setEditMode(!isEditMode)}
-              className="flex justify-center"
-            >
-              {isEditMode ? (
-                <VideoCameraIcon
-                  className="h-5"
-                  title="Switch to preview mode"
-                />
-              ) : (
-                <PencilIcon className="h-5" title="Switch to edit mode" />
-              )}
-            </button>
-            <button
-              onClick={() => sceneRef.current!.resetCamera()}
-              className="mt-2 flex justify-center"
-            >
-              <ArrowPathIcon className="h-5" title="Reset camera position" />
-            </button>
-            <hr className="mt-2" />
-            <button
-              className="mt-2 flex justify-center"
-              onClick={() => sceneRef.current!.loadModel('/models/chair.glb')}
-              title="Load 3D model of chair"
-            >
-              <ChairIcon className="h-5" fill="white" />
-            </button>
-            <button
-              className="mt-2 flex justify-center"
-              onClick={() =>
-                sceneRef.current!.loadModel('/models/circle-desk.glb')
-              }
-              title="Load 3D model of circle table"
-            >
-              <CircleTableIcon className="h-5" fill="white" />
-            </button>
-            <button
-              className="mt-2 flex justify-center"
-              onClick={() =>
-                sceneRef.current!.loadModel('/models/square-desk.glb')
-              }
-              title="Load 3D model of square table"
-            >
-              <SquareDeskIcon className="h-5" fill="white" />
-            </button>
-            <button
-              className="mt-2 flex justify-center"
-              onClick={() =>
-                sceneRef.current!.loadModel('/models/scaled-square-desk.glb')
-              }
-              title="Load 3D model of square table"
-            >
-              <ScaledSquareDeskIcon className="h-5" fill="white" />
-            </button>
           </div>
-          {currentFloorIndex !== null ? undefined : (
-            <div className="absolute left-0 top-0 h-[400px] w-[600px] cursor-not-allowed bg-black opacity-80"></div>
-          )}
-          {currentFloorIndex !== null && (
-            <span className="whitespace-no-wrap absolute left-2 top-0 max-w-48 select-none overflow-hidden text-ellipsis">
-              {floors[currentFloorIndex].label}
-            </span>
-          )}
-          <SelectFloorSideBar
-            floors={floors}
-            onSelect={(floor, index) => {
-              setCurrentFloorIndex(index);
-              sceneRef.current?.restore(floor);
-            }}
-            onDelete={(floor, index) => {
-              if (currentFloorIndex === index) {
-                setCurrentFloorIndex(null);
-              }
-              dispatch({ action: 'delete', floor });
-            }}
-            onLabelChange={(floor, index) => {
-              dispatch({ action: 'update', floor, index });
-            }}
-          />
         </div>
       </div>
     </div>
