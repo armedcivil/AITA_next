@@ -119,7 +119,9 @@ export const Select = forwardRef(function Select(
       .forEach((element, index, parent) => {
         element.parentElement?.removeChild(element);
       });
-    dispatch({});
+    if (event.shiftKey) {
+      dispatch({});
+    }
   }, []);
 
   // クリックされた時のコールバック

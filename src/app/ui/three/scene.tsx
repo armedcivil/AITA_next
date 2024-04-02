@@ -1,7 +1,10 @@
 'use client';
 
 import { useThree } from '@/app/lib/three/three-fiber-exporter';
-import { TransformControls } from '@/app/lib/three/three-drei-exporter';
+import {
+  PivotControls,
+  TransformControls,
+} from '@/app/lib/three/three-drei-exporter';
 import * as THREE from 'three';
 import React, {
   useEffect,
@@ -51,6 +54,10 @@ const Scene = (
 
   const selectedGroup = useRef<THREE.Group<THREE.Object3DEventMap>>(null);
   const selectRef = useRef<SelectMethod>(null);
+  const pivotRef = useRef<THREE.Group<THREE.Object3DEventMap>>(null);
+
+  const startMatrixRef = useRef<THREE.Matrix4>();
+  const pivotMatrixRef = useRef<THREE.Matrix4>(new THREE.Matrix4());
 
   // Scene の状態を JSON 化する
   const toJSON = (): { objects: SceneObject[] } => {
@@ -121,6 +128,7 @@ const Scene = (
       allObject.forEach((value: THREE.Object3D) => {
         selectRef.current?.add(value);
       });
+      scene.attach(new THREE.BoxHelper(selectedGroup.current!, '#ff00ff'));
       setInitialized(true);
     }
   }, [allObject, initialized]);
@@ -272,28 +280,57 @@ const Scene = (
               groupCenter.y,
               groupCenter.z,
             );
+            pivotMatrixRef.current?.setPosition(
+              groupCenter.x,
+              groupCenter.y,
+              groupCenter.z,
+            );
           }
         }}
       >
         <group ref={selectedGroup}></group>
       </Select>
 
-      <TransformControls
-        attach="transformControls"
-        object={selectedGroup.current!}
-        showX={transformMode !== 'rotate'}
-        showY={transformMode === 'rotate'}
-        showZ={transformMode !== 'rotate'}
-        enabled={isEditMode}
-        mode={transformMode}
-        rotationSnap={Math.PI / 36}
-        translationSnap={0.05}
-        onObjectChange={() => {
-          onChange?.(toJSON());
+      <PivotControls
+        ref={pivotRef}
+        matrix={pivotMatrixRef.current}
+        autoTransform={false}
+        depthTest={false}
+        activeAxes={[true, false, true]}
+        visible={isEditMode}
+        disableScaling={true}
+        onDragStart={() => {
+          startMatrixRef.current = selectedGroup.current?.matrix.clone();
         }}
+        onDrag={(
+          l: THREE.Matrix4,
+          deltaL: THREE.Matrix4,
+          w: THREE.Matrix4,
+          deltaW: THREE.Matrix4,
+        ) => {
+          const startQuaternion = new THREE.Quaternion();
+          startMatrixRef.current!.decompose(
+            new THREE.Vector3(),
+            startQuaternion,
+            new THREE.Vector3(),
+          );
+
+          const position = new THREE.Vector3();
+          const quaternion = new THREE.Quaternion();
+          l.decompose(position, quaternion, new THREE.Vector3());
+
+          selectedGroup.current?.setRotationFromQuaternion(startQuaternion);
+          selectedGroup.current?.applyQuaternion(quaternion);
+
+          const { x, y, z } = position.clone();
+          selectedGroup.current?.position.set(x, y, z);
+
+          pivotMatrixRef.current.copyPosition(l);
+        }}
+        onDragEnd={() => {}}
       />
 
-      <gridHelper args={[200, 20]} />
+      <gridHelper args={[200, 100]} />
     </>
   );
 };
