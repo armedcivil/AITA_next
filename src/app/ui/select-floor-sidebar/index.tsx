@@ -46,6 +46,12 @@ export default function SelectFloorSideBar({
             },
           )}
         >
+          {floors.length <= 0 && (
+            <p className="p-2 text-gray-500">
+              No floors. <br />
+              Create a new floor.
+            </p>
+          )}
           <div>
             {floors.map((floor, index) => (
               <Cell
