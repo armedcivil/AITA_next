@@ -148,16 +148,6 @@ export default function Page() {
             <button onClick={() => sceneRef.current!.resetCamera()}>
               reset camera
             </button>
-            <button
-              onClick={() => sceneRef.current!.changeTransformMode('translate')}
-            >
-              translate
-            </button>
-            <button
-              onClick={() => sceneRef.current!.changeTransformMode('rotate')}
-            >
-              rotate
-            </button>
             <div className="flex flex-row justify-center">
               <button
                 className="mx-3"

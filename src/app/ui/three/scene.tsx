@@ -27,7 +27,6 @@ export interface SceneMethod {
   resetCamera: () => void;
   toJSON: () => Floor;
   restore: (json: Floor) => void;
-  changeTransformMode: (mode: 'translate' | 'rotate') => void;
   loadModel: (path: string) => void;
   removeSelected: () => void;
   cloneSelected: () => void;
@@ -48,9 +47,6 @@ const Scene = (
   const renderer = useThree((state) => state.gl);
   const [initialized, setInitialized] = useState(false);
   const [allObject, setAllObject] = useState<THREE.Object3D[]>([]);
-  const [transformMode, setTransformMode] = useState<'translate' | 'rotate'>(
-    'translate',
-  );
 
   const selectedGroup = useRef<THREE.Group<THREE.Object3DEventMap>>(null);
   const selectRef = useRef<SelectMethod>(null);
@@ -89,9 +85,6 @@ const Scene = (
       setAllObject(await restore(json.objects));
       setInitialized(false);
     },
-    changeTransformMode(mode: 'translate' | 'rotate') {
-      setTransformMode(mode);
-    },
     // TODO: 机・椅子の区別が付けられるように userData に type プロパティをつける
     async loadModel(path: string) {
       const gltfModel = await loadGLTF(path);
@@ -128,7 +121,6 @@ const Scene = (
       allObject.forEach((value: THREE.Object3D) => {
         selectRef.current?.add(value);
       });
-      scene.attach(new THREE.BoxHelper(selectedGroup.current!, '#ff00ff'));
       setInitialized(true);
     }
   }, [allObject, initialized]);
