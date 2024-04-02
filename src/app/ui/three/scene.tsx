@@ -126,11 +126,28 @@ const Scene = (
   }, [allObject, initialized]);
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const handleKeyDown = async (e: KeyboardEvent) => {
       if (e.ctrlKey || e.metaKey) {
         if (e.key === 'a') {
           e.preventDefault();
           selectRef.current?.selectAll();
+        }
+
+        if (e.key === 'c') {
+          e.preventDefault();
+          const objects = cloneObjects(selectedGroup.current?.children);
+          const result = { objects: save(objects) };
+          await navigator.clipboard.writeText(JSON.stringify(result));
+        }
+
+        if (e.key === 'v') {
+          e.preventDefault();
+          const clipboardText = await navigator.clipboard.readText();
+          const clonedObjects = await restore(
+            JSON.parse(clipboardText).objects,
+          );
+          setAllObject([...allObject, ...clonedObjects]);
+          setInitialized(false);
         }
       }
     };
@@ -217,13 +234,13 @@ const Scene = (
       });
   };
 
-  // FIXME: Clone した物だと透明にならない
-  // オブジェクトの複製処理
-  const clone = (selectedObjects: THREE.Object3D[] | undefined) => {
+  const cloneObjects = (
+    selectedObjects: THREE.Object3D[] | undefined,
+  ): THREE.Object3D[] => {
     if (!selectedObjects) {
-      return;
+      return [];
     }
-    const clonedObjects = selectedObjects.map((object) => {
+    return selectedObjects.map((object) => {
       const cloned = object.clone() as THREE.Mesh;
       if (Array.isArray(cloned.material)) {
         const clonedMaterials = (cloned.material as THREE.Material[]).map(
@@ -235,6 +252,15 @@ const Scene = (
       }
       return cloned;
     });
+  };
+
+  // FIXME: Clone した物だと透明にならない
+  // オブジェクトの複製処理
+  const clone = (selectedObjects: THREE.Object3D[] | undefined) => {
+    if (!selectedObjects) {
+      return;
+    }
+    const clonedObjects = cloneObjects(selectedObjects);
     attachObjectsToSelectGroup([]);
     clonedObjects.forEach((object) => selectedGroup.current?.attach(object));
     setAllObject([...allObject, ...clonedObjects]);
