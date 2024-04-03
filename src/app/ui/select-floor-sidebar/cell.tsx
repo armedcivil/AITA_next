@@ -31,7 +31,7 @@ export default function Cell({
             }}
           />
           <CheckIcon
-            className="ml-auto mr-2 h-5 cursor-pointer"
+            className="ml-auto mr-2 h-5 cursor-pointer text-red-400"
             onClick={(e) => {
               e.stopPropagation();
               setIsEdit(false);
@@ -51,7 +51,7 @@ export default function Cell({
           </span>
           <div className="ml-auto mr-2 cursor-pointer">
             <PencilIcon
-              className="h-5"
+              className="h-5 text-red-400"
               onClick={(e) => {
                 e.stopPropagation();
                 setIsEdit(true);

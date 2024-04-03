@@ -16,7 +16,7 @@ export default function DeleteFloorButton({
   return (
     <>
       <TrashIcon
-        className="h-5"
+        className="h-5 text-red-400"
         onClick={(e) => {
           e.stopPropagation();
           setShowModal(true);

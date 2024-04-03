@@ -10,6 +10,7 @@ import {
   ArrowPathIcon,
   PencilIcon,
   PlusIcon,
+  QuestionMarkCircleIcon,
   VideoCameraIcon,
 } from '@heroicons/react/24/outline';
 import { Floor } from '@/app/lib/three/scene-store';
@@ -18,6 +19,8 @@ import CircleTableIcon from '@/app/ui/icons/circle-table-icon';
 import ChairIcon from '@/app/ui/icons/chair-icon';
 import SquareDeskIcon from '@/app/ui/icons/square-desk-icon';
 import ScaledSquareDeskIcon from '@/app/ui/icons/scaled-square-desk-icon';
+import { createPortal } from 'react-dom';
+import EditorHelp from '@/app/ui/editor-help';
 
 interface DeleteAction {
   action: 'delete';
@@ -61,34 +64,43 @@ export default function Page() {
     },
     [],
   );
-  const newFloorName = useRef<HTMLInputElement>(null);
+  const floorNameInput = useRef<HTMLInputElement>(null);
+  const [showHelp, setShowHelp] = useState<boolean>(false);
 
-  // TODO: キーボード操作で全選択・クリップボードへコピー・クリップボードからペーストを出来るようにする
-  // TODO: 操作の UI を作る(マウス操作で出来ることの説明含む)
   // TODO: localStore への一時保存機能(定期実行＆手動実行)
   // TODO: シーンの情報のアップロード
   // TODO: カスタムなモデルの読み込み機能
   return (
     <div className="h-full p-3">
-      <div className="mb-2 flex w-full flex-row justify-end">
+      <div className="mb-2 flex w-full flex-row items-center justify-end">
         <input
-          ref={newFloorName}
+          ref={floorNameInput}
           className="ml-auto h-10 w-64 rounded-lg border-2 border-red-400 p-2"
           placeholder="Input name of new floor"
         />
         <Button
           className="ml-4"
           onClick={() => {
-            if (!newFloorName.current || newFloorName.current.value === '') {
+            if (
+              !floorNameInput.current ||
+              floorNameInput.current.value === ''
+            ) {
               return;
             }
-            dispatch({ action: 'create', label: newFloorName.current.value });
-            newFloorName.current.value = '';
+            dispatch({ action: 'create', label: floorNameInput.current.value });
+            floorNameInput.current.value = '';
           }}
         >
           Create Floor
           <PlusIcon className="h-5 md:ml-4" />
         </Button>
+        <QuestionMarkCircleIcon
+          className="ml-4 h-5 text-red-400 hover:text-red-200"
+          onClick={() => {
+            setShowHelp(!showHelp);
+          }}
+          title="Editor help"
+        />
       </div>
       <div className="flex w-full justify-center">
         <div className="flex flex-col items-center rounded-lg border-2 border-gray-100 p-4 shadow-2xl">
@@ -209,6 +221,15 @@ export default function Page() {
                 dispatch({ action: 'update', floor, index });
               }}
             />
+            {showHelp &&
+              createPortal(
+                <EditorHelp
+                  onClose={() => {
+                    setShowHelp(false);
+                  }}
+                />,
+                document.getElementById('help')!,
+              )}
           </div>
         </div>
       </div>

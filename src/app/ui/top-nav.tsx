@@ -9,7 +9,7 @@ export default function TopNav() {
   const pathname = usePathname();
 
   return (
-    <div className="flex items-center shadow-lg">
+    <div className="flex h-16 items-center shadow-lg">
       <Image
         src="/img/AITA.png"
         width={56}
@@ -18,7 +18,7 @@ export default function TopNav() {
         className="justify-self-start"
         priority={true}
       />
-      <div className="ml-6 h-full px-6">
+      <div className="ml-6 flex h-full items-center px-6">
         <Link
           href={'/company'}
           className={clsx('', {
@@ -28,7 +28,7 @@ export default function TopNav() {
           Profile
         </Link>
       </div>
-      <div className="h-full justify-self-start px-6">
+      <div className="flex h-full items-center justify-self-start px-6">
         <Link
           href={'/company/users'}
           className={clsx('', {
@@ -38,7 +38,7 @@ export default function TopNav() {
           Users
         </Link>
       </div>
-      <div className="h-full justify-self-start px-6">
+      <div className="flex h-full items-center  justify-self-start px-6">
         <Link
           href={'/company/editor'}
           className={clsx('', {
@@ -48,7 +48,7 @@ export default function TopNav() {
           Editor
         </Link>
       </div>
-      <div className="ml-auto h-full justify-self-end px-6">
+      <div className="ml-auto flex h-full items-center justify-self-end px-6">
         <Link
           href={'/logout'}
           className={clsx('', {
