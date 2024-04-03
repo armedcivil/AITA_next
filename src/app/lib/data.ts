@@ -1,5 +1,6 @@
 import prisma from '@/app/lib/prisma';
 import { fetcha, FetchaError } from '@co-labo-hub/fetcha';
+import { Floor } from './three/scene-store';
 
 const COUNT_PER_PAGE = 10;
 const apiHost = process.env.API_HOST;
@@ -73,6 +74,25 @@ export async function fetchUser(accessToken: string, userId: string) {
       name: string;
       email: string;
     }>();
+    return data;
+  } catch (e: any) {
+    return {
+      error: {
+        message: e.message.toString(),
+      },
+    };
+  }
+}
+
+export async function fetchFloors(
+  accessToken: string,
+): Promise<{ floors?: Floor[]; error?: { message: string } }> {
+  try {
+    const response = await fetcha(`${apiHost}/company/floor`)
+      .header('Authorization', `Bearer ${accessToken}`)
+      .get();
+
+    const data = await response.toJson<{ floors: Floor[] }>();
     return data;
   } catch (e: any) {
     return {
