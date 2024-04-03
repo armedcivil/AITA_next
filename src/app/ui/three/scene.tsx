@@ -346,6 +346,8 @@ const Scene = (
           selectedGroup.current?.position.set(x, y, z);
 
           pivotMatrixRef.current.copyPosition(l);
+
+          onChange?.(toJSON());
         }}
         onDragEnd={() => {}}
       />
