@@ -110,7 +110,7 @@ const Editor = ({ defaultFloors }: { defaultFloors: Floor[] }, ref: any) => {
           title="Editor help"
         />
       </div>
-      <div className="flex w-full justify-center">
+      <div className="mt-4 flex w-full justify-center">
         <div className="flex flex-col items-center rounded-lg border-2 border-gray-100 p-4 shadow-2xl">
           <div className="relative h-[400px] w-[600px]">
             <Canvas
