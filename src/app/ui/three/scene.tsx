@@ -44,9 +44,6 @@ const Scene = (
   const scene = useThree((state) => state.scene);
   const renderer = useThree((state) => state.gl);
   const camera = useThree((state) => state.camera);
-  const [initialized, setInitialized] = useState(false);
-  // TODO: allObject 抹殺計画
-  const [allObject, setAllObject] = useState<THREE.Object3D[]>([]);
 
   const selectedGroup = useRef<THREE.Group<THREE.Object3DEventMap>>(null);
   const selectRef = useRef<SelectMethod>(null);
@@ -90,13 +87,14 @@ const Scene = (
     async restore(json: { objects: SceneObject[] }) {
       selectRef.current?.clear();
       selectedGroup.current?.clear();
-      setAllObject(await restore(json.objects));
-      setInitialized(false);
+      const restoredObjects = await restore(json.objects);
+      restoredObjects.forEach((object) => {
+        selectRef.current?.attach(object);
+      });
     },
     // TODO: 机・椅子の区別が付けられるように userData に type プロパティをつける
     async loadModel(path: string) {
       const gltfModel = await loadGLTF(path);
-      setAllObject([...allObject, gltfModel]);
       selectRef.current?.attach(gltfModel);
       onChange?.(toJSON());
     },
@@ -120,16 +118,6 @@ const Scene = (
     };
   }, [renderer]);
 
-  // シーンの初期化。restore メソッドが呼ばれて再レンダリングされたときに実行される
-  useEffect(() => {
-    if (!initialized) {
-      allObject.forEach((value: THREE.Object3D) => {
-        selectRef.current?.add(value);
-      });
-      setInitialized(true);
-    }
-  }, [allObject, initialized]);
-
   useEffect(() => {
     const handleKeyDown = async (e: KeyboardEvent) => {
       if (e.ctrlKey || e.metaKey) {
@@ -151,7 +139,6 @@ const Scene = (
           const clonedObjects = await restore(
             JSON.parse(clipboardText).objects,
           );
-          setAllObject([...allObject, ...clonedObjects]);
           clonedObjects.forEach((object) => {
             selectRef.current?.attach(object);
           });
@@ -278,7 +265,6 @@ const Scene = (
     const clonedObjects = cloneObjects(selectedObjects);
     attachObjectsToSelectGroup([]);
     clonedObjects.forEach((object) => selectedGroup.current?.attach(object));
-    setAllObject([...allObject, ...clonedObjects]);
     onChange?.(toJSON());
   };
 
