@@ -15,6 +15,8 @@ export default async function Page() {
 
   // TODO: localStore への一時保存機能(定期実行＆手動実行)
   // TODO: シーンの情報のアップロード
+  // TODO: シーンのアップロード中は Upload ボタン非活性、アイコンをローディングに変更
+  // TODO: シーン、モデル読み込み時にローディング出す
   // TODO: カスタムなモデルの読み込み機能
   return (
     <div className="h-full p-3">
