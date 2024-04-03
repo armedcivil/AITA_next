@@ -19,6 +19,7 @@ import {
   SceneObject,
 } from '@/app/lib/three/scene-store';
 
+// TODO: 不用品回収
 // Scene コンポーネントのメソッド宣言
 export interface SceneMethod {
   resetCamera: () => void;
@@ -44,6 +45,7 @@ const Scene = (
   const renderer = useThree((state) => state.gl);
   const camera = useThree((state) => state.camera);
   const [initialized, setInitialized] = useState(false);
+  // TODO: allObject 抹殺計画
   const [allObject, setAllObject] = useState<THREE.Object3D[]>([]);
 
   const selectedGroup = useRef<THREE.Group<THREE.Object3DEventMap>>(null);
