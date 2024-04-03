@@ -13,13 +13,15 @@ import {
   VideoCameraIcon,
   PlusIcon,
   QuestionMarkCircleIcon,
+  DocumentArrowUpIcon,
 } from '@heroicons/react/24/outline';
 import Scene, { SceneMethod } from '@/app/ui/three/scene';
 import { useState, useRef, useReducer } from 'react';
 import { Floor } from '@/app/lib/three/scene-store';
-import { createPortal } from 'react-dom';
+import { createPortal, useFormState } from 'react-dom';
 import EditorHelp from '@/app/ui/editor-help';
 import { Button } from '@/app/ui/button';
+import { upsertFloors } from '../lib/actions';
 
 interface DeleteAction {
   action: 'delete';
@@ -65,6 +67,9 @@ const Editor = ({ defaultFloors }: { defaultFloors: Floor[] }, ref: any) => {
     },
     defaultFloors,
   );
+  const [state, formDispatch] = useFormState(upsertFloors, {
+    error: { message: '' },
+  });
 
   return (
     <>
@@ -90,6 +95,13 @@ const Editor = ({ defaultFloors }: { defaultFloors: Floor[] }, ref: any) => {
           Create Floor
           <PlusIcon className="h-5 md:ml-4" />
         </Button>
+        <form action={formDispatch}>
+          <input type="hidden" name="floors" value={JSON.stringify(floors)} />
+          <Button className="ml-4">
+            Upload
+            <DocumentArrowUpIcon className="h-5 md:ml-4" />
+          </Button>
+        </form>
         <QuestionMarkCircleIcon
           className="ml-4 h-5 text-red-400 hover:text-red-200"
           onClick={() => {
@@ -126,14 +138,16 @@ const Editor = ({ defaultFloors }: { defaultFloors: Floor[] }, ref: any) => {
                 isEditMode={isEditMode}
                 ref={sceneRef}
                 onChange={(result) => {
-                  dispatch({
-                    action: 'update',
-                    index: currentFloorIndex!,
-                    floor: {
-                      objects: result.objects,
-                      label: floors[currentFloorIndex!].label,
-                    },
-                  });
+                  if (currentFloorIndex !== null) {
+                    dispatch({
+                      action: 'update',
+                      index: currentFloorIndex!,
+                      floor: {
+                        objects: result.objects,
+                        label: floors[currentFloorIndex].label,
+                      },
+                    });
+                  }
                 }}
               />
             </Canvas>

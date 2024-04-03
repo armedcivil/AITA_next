@@ -150,10 +150,14 @@ const Scene = (
             JSON.parse(clipboardText).objects,
           );
           setAllObject([...allObject, ...clonedObjects]);
-          setInitialized(false);
+          clonedObjects.forEach((object) => {
+            selectRef.current?.attach(object);
+          });
+          onChange?.(toJSON());
         }
         if (e.key === 'Delete' || e.key === 'Backspace') {
           removeSelected();
+          onChange?.(toJSON());
         }
       }
     };

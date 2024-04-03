@@ -4,6 +4,7 @@ import { fetcha, FetchaError } from '@co-labo-hub/fetcha';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { Floor } from './three/scene-store';
 
 const apiHost = process.env.API_HOST;
 
@@ -265,17 +266,19 @@ export async function updateCompanyProfile(
       id: number;
       name: string;
       email: string;
-      password?: string
+      password?: string;
       passwordConfirmation?: string;
     } = {
-      id: parseInt(formData.get('id')!.toString()), 
-      name: formData.get('name')!.toString(), 
-      email: formData.get('email')!.toString() 
-    }
+      id: parseInt(formData.get('id')!.toString()),
+      name: formData.get('name')!.toString(),
+      email: formData.get('email')!.toString(),
+    };
 
     if (formData.get('password')) {
       requestBody.password = formData.get('password')!.toString();
-      requestBody.passwordConfirmation = formData.get('passwordConfirmation')!.toString();
+      requestBody.passwordConfirmation = formData
+        .get('passwordConfirmation')!
+        .toString();
     }
 
     const tokenCookie = cookies().get('token');
@@ -294,6 +297,36 @@ export async function updateCompanyProfile(
         message: 'Unauthorized',
       },
     };
+  } catch (e: any) {
+    return {
+      error: {
+        message: e.message.toString(),
+      },
+    };
+  }
+}
+
+export type UpsertFloorState = {
+  result?: string;
+  error?: { message: string };
+};
+
+export async function upsertFloors(
+  prevState: UpsertFloorState,
+  formData: FormData,
+): Promise<UpsertFloorState> {
+  try {
+    const formFloors = formData.get('floors');
+    const tokenCookie = cookies().get('token');
+    if (tokenCookie && formFloors) {
+      await fetcha(`${apiHost}/company/floor`)
+        .body({ floors: JSON.parse(formFloors.toString()) })
+        .header('Content-Type', 'application/json')
+        .header('Authorization', `Bearer ${tokenCookie.value}`)
+        .post();
+      return { result: 'success' };
+    }
+    return { error: { message: 'Unauthorized' } };
   } catch (e: any) {
     return {
       error: {
