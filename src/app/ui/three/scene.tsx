@@ -50,6 +50,8 @@ const Scene = (
 
   const [pivotScale, setPivotScale] = useState<number>(1);
 
+  const [isTransforming, setIsTransforming] = useState<boolean>(false);
+
   // Scene の状態を JSON 化する
   const toJSON = (): { objects: SceneObject[] } => {
     const selectedObjects = selectedGroup.current!.children.map((object) => {
@@ -272,6 +274,9 @@ const Scene = (
           (scene as any).cameraControls.enabled = true;
         }}
         onSelectionChange={(objectArray) => {
+          if (isTransforming) {
+            return;
+          }
           const groupQuaternion = selectedGroup.current!.quaternion.clone();
           const groupCenter = calculateGroupCenter(objectArray);
           attachObjectsToSelectedGroup(
@@ -311,6 +316,7 @@ const Scene = (
         scale={pivotScale}
         disableScaling={true}
         onDragStart={() => {
+          setIsTransforming(true);
           startMatrixRef.current = selectedGroup.current?.matrix.clone();
         }}
         onDrag={(
@@ -340,7 +346,9 @@ const Scene = (
 
           onChange?.(toJSON());
         }}
-        onDragEnd={() => {}}
+        onDragEnd={() => {
+          setIsTransforming(false);
+        }}
       />
 
       <gridHelper args={[200, 100]} />
