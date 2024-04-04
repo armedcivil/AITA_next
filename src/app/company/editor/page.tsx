@@ -13,7 +13,6 @@ export default async function Page() {
     }
   }
 
-  // TODO: シーン、モデル読み込み時にローディング出す
   // TODO: カスタムなモデルの読み込み機能
   return (
     <div className="h-full p-3">

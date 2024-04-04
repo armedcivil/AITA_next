@@ -22,6 +22,7 @@ import EditorHelp from '@/app/ui/editor-help';
 import { Button } from '@/app/ui/button';
 import { upsertFloors } from '../lib/actions';
 import { UploadFloorButton } from '@/app/ui/buttons-client';
+import LoadingIcon from './icons/loading-icon';
 
 interface DeleteAction {
   action: 'delete';
@@ -70,6 +71,7 @@ const Editor = ({ defaultFloors }: { defaultFloors: Floor[] }, ref: any) => {
   const [state, formDispatch] = useFormState(upsertFloors, {
     error: { message: '' },
   });
+  const [showLoading, setShowLoading] = useState(false);
 
   return (
     <>
@@ -170,42 +172,57 @@ const Editor = ({ defaultFloors }: { defaultFloors: Floor[] }, ref: any) => {
               <hr className="mt-2" />
               <button
                 className="mt-2 flex justify-center"
-                onClick={() => sceneRef.current!.loadModel('/models/chair.glb')}
+                onClick={async () => {
+                  setShowLoading(true);
+                  await sceneRef.current!.loadModel('/models/chair.glb');
+                  setShowLoading(false);
+                }}
                 title="Load 3D model of chair"
               >
                 <ChairIcon className="h-5" fill="white" />
               </button>
               <button
                 className="mt-2 flex justify-center"
-                onClick={() =>
-                  sceneRef.current!.loadModel('/models/circle-desk.glb')
-                }
+                onClick={async () => {
+                  setShowLoading(true);
+                  await sceneRef.current!.loadModel('/models/circle-desk.glb');
+                  setShowLoading(false);
+                }}
                 title="Load 3D model of circle table"
               >
                 <CircleTableIcon className="h-5" fill="white" />
               </button>
               <button
                 className="mt-2 flex justify-center"
-                onClick={() =>
-                  sceneRef.current!.loadModel('/models/square-desk.glb')
-                }
+                onClick={async () => {
+                  setShowLoading(true);
+                  await sceneRef.current!.loadModel('/models/square-desk.glb');
+                  setShowLoading(false);
+                }}
                 title="Load 3D model of square table"
               >
                 <SquareDeskIcon className="h-5" fill="white" />
               </button>
               <button
                 className="mt-2 flex justify-center"
-                onClick={() =>
-                  sceneRef.current!.loadModel('/models/scaled-square-desk.glb')
-                }
+                onClick={async () => {
+                  setShowLoading(true);
+                  await sceneRef.current!.loadModel(
+                    '/models/scaled-square-desk.glb',
+                  );
+                  setShowLoading(false);
+                }}
                 title="Load 3D model of square table"
               >
                 <ScaledSquareDeskIcon className="h-5" fill="white" />
               </button>
             </div>
-            {currentFloorIndex !== null ? undefined : (
-              <div className="absolute left-0 top-0 h-[400px] w-[600px] cursor-not-allowed bg-black opacity-80"></div>
-            )}
+            {currentFloorIndex === null ||
+              (showLoading && (
+                <div className="absolute left-0 top-0 flex h-[400px] w-[600px] cursor-not-allowed items-center justify-center bg-black opacity-80">
+                  <LoadingIcon className="h-48 animate-spin" fill="white" />
+                </div>
+              ))}
             {currentFloorIndex !== null && (
               <span className="whitespace-no-wrap absolute left-2 top-0 max-w-48 select-none overflow-hidden text-ellipsis">
                 {floors[currentFloorIndex].label}
@@ -213,9 +230,11 @@ const Editor = ({ defaultFloors }: { defaultFloors: Floor[] }, ref: any) => {
             )}
             <SelectFloorSideBar
               floors={floors}
-              onSelect={(floor, index) => {
+              onSelect={async (floor, index) => {
                 setCurrentFloorIndex(index);
-                sceneRef.current?.restore(floor);
+                setShowLoading(true);
+                await sceneRef.current?.restore(floor);
+                setShowLoading(false);
               }}
               onDelete={(floor, index) => {
                 if (currentFloorIndex === index) {
