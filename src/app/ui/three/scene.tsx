@@ -19,15 +19,11 @@ import {
   SceneObject,
 } from '@/app/lib/three/scene-store';
 
-// TODO: 不用品回収
 // Scene コンポーネントのメソッド宣言
 export interface SceneMethod {
   resetCamera: () => void;
-  toJSON: () => Floor;
   restore: (json: Floor) => void;
   loadModel: (path: string) => void;
-  removeSelected: () => void;
-  cloneSelected: () => void;
 }
 
 // Scene コンポーネント
@@ -83,7 +79,6 @@ const Scene = (
     resetCamera() {
       (scene as any).cameraControls.reset(true);
     },
-    toJSON,
     async restore(json: { objects: SceneObject[] }) {
       selectRef.current?.clear();
       selectedGroup.current?.clear();
@@ -97,10 +92,6 @@ const Scene = (
       const gltfModel = await loadGLTF(path);
       selectRef.current?.attach(gltfModel);
       onChange?.(toJSON());
-    },
-    removeSelected,
-    cloneSelected() {
-      clone(selectedGroup.current?.children);
     },
   }));
 
