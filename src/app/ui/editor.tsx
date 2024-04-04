@@ -13,7 +13,6 @@ import {
   VideoCameraIcon,
   PlusIcon,
   QuestionMarkCircleIcon,
-  DocumentArrowUpIcon,
 } from '@heroicons/react/24/outline';
 import Scene, { SceneMethod } from '@/app/ui/three/scene';
 import { useState, useRef, useReducer } from 'react';
@@ -22,6 +21,7 @@ import { createPortal, useFormState } from 'react-dom';
 import EditorHelp from '@/app/ui/editor-help';
 import { Button } from '@/app/ui/button';
 import { upsertFloors } from '../lib/actions';
+import { UploadFloorButton } from '@/app/ui/buttons-client';
 
 interface DeleteAction {
   action: 'delete';
@@ -97,10 +97,7 @@ const Editor = ({ defaultFloors }: { defaultFloors: Floor[] }, ref: any) => {
         </Button>
         <form action={formDispatch}>
           <input type="hidden" name="floors" value={JSON.stringify(floors)} />
-          <Button className="ml-4">
-            Upload
-            <DocumentArrowUpIcon className="h-5 md:ml-4" />
-          </Button>
+          <UploadFloorButton />
         </form>
         <QuestionMarkCircleIcon
           className="ml-4 h-5 text-red-400 hover:text-red-200"

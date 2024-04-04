@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { PlusIcon } from '@heroicons/react/24/outline';
+import { Button } from '@/app/ui/button';
 import clsx from 'clsx';
 
 export function CreateButton({ className }: { className?: string | null }) {

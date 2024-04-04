@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { PencilIcon } from '@heroicons/react/24/outline';
 import { fetchUsers } from '../lib/data';
-import { DeleteUserButton } from './buttons-server';
+import { DeleteUserButton } from './buttons-client';
 import { cookies } from 'next/headers';
 
 export default async function Table({

@@ -1,8 +1,14 @@
 'use client';
 
-import { TrashIcon } from '@heroicons/react/24/outline';
+import {
+  TrashIcon,
+  DocumentArrowUpIcon,
+  ArrowPathIcon,
+} from '@heroicons/react/24/outline';
 import { deleteUser } from '../lib/actions';
-import { useFormState } from 'react-dom';
+import { useFormState, useFormStatus } from 'react-dom';
+import { Button } from '@/app/ui/button';
+import LoadingIcon from './icons/loading-icon';
 
 // TODO: モーダル出して削除前に確認
 export function DeleteUserButton({
@@ -24,5 +30,19 @@ export function DeleteUserButton({
         </button>
       </form>
     </div>
+  );
+}
+
+export function UploadFloorButton() {
+  const { pending } = useFormStatus();
+  return (
+    <Button className="ml-4" disabled={pending}>
+      Upload
+      {pending ? (
+        <LoadingIcon className="h-5 animate-spin md:ml-4" fill="white" />
+      ) : (
+        <DocumentArrowUpIcon className="h-5 md:ml-4" />
+      )}
+    </Button>
   );
 }
