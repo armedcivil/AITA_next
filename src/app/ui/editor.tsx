@@ -174,7 +174,9 @@ const Editor = ({ defaultFloors }: { defaultFloors: Floor[] }, ref: any) => {
                 className="mt-2 flex justify-center"
                 onClick={async () => {
                   setShowLoading(true);
-                  await sceneRef.current!.loadModel('/models/chair.glb');
+                  await sceneRef.current!.loadModel(
+                    'http://localhost:3001/models/chair.glb',
+                  );
                   setShowLoading(false);
                 }}
                 title="Load 3D model of chair"
@@ -185,7 +187,9 @@ const Editor = ({ defaultFloors }: { defaultFloors: Floor[] }, ref: any) => {
                 className="mt-2 flex justify-center"
                 onClick={async () => {
                   setShowLoading(true);
-                  await sceneRef.current!.loadModel('/models/circle-desk.glb');
+                  await sceneRef.current!.loadModel(
+                    'http://localhost:3001/models/circle-desk.glb',
+                  );
                   setShowLoading(false);
                 }}
                 title="Load 3D model of circle table"
@@ -196,7 +200,9 @@ const Editor = ({ defaultFloors }: { defaultFloors: Floor[] }, ref: any) => {
                 className="mt-2 flex justify-center"
                 onClick={async () => {
                   setShowLoading(true);
-                  await sceneRef.current!.loadModel('/models/square-desk.glb');
+                  await sceneRef.current!.loadModel(
+                    'http://localhost:3001/models/square-desk.glb',
+                  );
                   setShowLoading(false);
                 }}
                 title="Load 3D model of square table"
@@ -208,7 +214,7 @@ const Editor = ({ defaultFloors }: { defaultFloors: Floor[] }, ref: any) => {
                 onClick={async () => {
                   setShowLoading(true);
                   await sceneRef.current!.loadModel(
-                    '/models/scaled-square-desk.glb',
+                    'http://localhost:3001/models/scaled-square-desk.glb',
                   );
                   setShowLoading(false);
                 }}
@@ -217,13 +223,12 @@ const Editor = ({ defaultFloors }: { defaultFloors: Floor[] }, ref: any) => {
                 <ScaledSquareDeskIcon className="h-5" fill="white" />
               </button>
             </div>
-            {currentFloorIndex === null ||
-              (showLoading && (
-                <div className="absolute left-0 top-0 flex h-[400px] w-[600px] cursor-not-allowed items-center justify-center bg-black opacity-80">
-                  <LoadingIcon className="h-48 animate-spin" fill="white" />
-                </div>
-              ))}
-            {currentFloorIndex !== null && (
+            {(currentFloorIndex === null || showLoading) && (
+              <div className="absolute left-0 top-0 flex h-[400px] w-[600px] cursor-not-allowed items-center justify-center bg-black opacity-80">
+                <LoadingIcon className="h-48 animate-spin" fill="white" />
+              </div>
+            )}
+            {currentFloorIndex !== null && floors[currentFloorIndex] && (
               <span className="whitespace-no-wrap absolute left-2 top-0 max-w-48 select-none overflow-hidden text-ellipsis">
                 {floors[currentFloorIndex].label}
               </span>
