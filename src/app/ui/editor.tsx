@@ -128,7 +128,6 @@ const Editor = ({ defaultFloors }: { defaultFloors: Floor[] }, ref: any) => {
                 rotation={[-(Math.PI / 2), 0, 0]}
               />
 
-              {/* FIXME: 原因は不明だが、何かのタイミングでカメラの移動が出来なくなる。怪しいのは (scene as any).cameraControls で直接アクセスしている箇所 */}
               <PositionSwitchCamera isEditMode={isEditMode} />
 
               <Scene
