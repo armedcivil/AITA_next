@@ -1,6 +1,8 @@
 import prisma from '@/app/lib/prisma';
 import { fetcha, FetchaError } from '@co-labo-hub/fetcha';
 import { Floor } from './three/scene-store';
+import { cookies } from 'next/headers';
+import { EditorAsset } from '../ui/editor-asset-list';
 
 const COUNT_PER_PAGE = 10;
 const apiHost = process.env.API_HOST;
@@ -100,5 +102,21 @@ export async function fetchFloors(
         message: e.message.toString(),
       },
     };
+  }
+}
+
+export async function fetchEditorAssets(accessToken: string): Promise<{
+  editorAssets?: EditorAsset[];
+  error?: { message: string };
+}> {
+  try {
+    const response = await fetcha(`${apiHost}/company/editor-asset`)
+      .header('Authorization', `Bearer ${accessToken}`)
+      .get();
+
+    const data = await response.toJson<{ editorAssets: EditorAsset[] }>();
+    return data;
+  } catch (e: any) {
+    return { error: { message: e.message.toString() } };
   }
 }

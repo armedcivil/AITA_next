@@ -3,10 +3,6 @@ import { Canvas } from '@/app/lib/three/three-fiber-exporter';
 import CanvasSetting from '@/app/ui/three/canvas-setting';
 import PositionSwitchCamera from '@/app/ui/three/position-switch-camera';
 import SelectFloorSideBar from '@/app/ui/select-floor-sidebar';
-import CircleTableIcon from '@/app/ui/icons/circle-table-icon';
-import ChairIcon from '@/app/ui/icons/chair-icon';
-import SquareDeskIcon from '@/app/ui/icons/square-desk-icon';
-import ScaledSquareDeskIcon from '@/app/ui/icons/scaled-square-desk-icon';
 import {
   ArrowPathIcon,
   PencilIcon,
@@ -23,6 +19,7 @@ import { Button } from '@/app/ui/button';
 import { upsertFloors } from '../lib/actions';
 import { UploadFloorButton } from '@/app/ui/buttons-client';
 import LoadingIcon from './icons/loading-icon';
+import EditorAssetList, { EditorAsset } from './editor-asset-list';
 
 interface DeleteAction {
   action: 'delete';
@@ -42,7 +39,13 @@ interface UpdateAction {
 
 type ActionArgs = DeleteAction | CreateAction | UpdateAction;
 
-const Editor = ({ defaultFloors }: { defaultFloors: Floor[] }, ref: any) => {
+const Editor = (
+  {
+    defaultFloors,
+    editorAssets,
+  }: { defaultFloors: Floor[]; editorAssets: EditorAsset[] },
+  ref: any,
+) => {
   const [isEditMode, setEditMode] = useState(true);
   const [showHelp, setShowHelp] = useState<boolean>(false);
   const sceneRef = useRef<SceneMethod | null>(null);
@@ -169,8 +172,8 @@ const Editor = ({ defaultFloors }: { defaultFloors: Floor[] }, ref: any) => {
               >
                 <ArrowPathIcon className="h-5" title="Reset camera position" />
               </button>
-              <hr className="mt-2" />
-              <button
+              {/* <hr className="mt-2" /> */}
+              {/* <button
                 className="mt-2 flex justify-center"
                 onClick={async () => {
                   setShowLoading(true);
@@ -221,8 +224,18 @@ const Editor = ({ defaultFloors }: { defaultFloors: Floor[] }, ref: any) => {
                 title="Load 3D model of square table"
               >
                 <ScaledSquareDeskIcon className="h-5" fill="white" />
-              </button>
+              </button> */}
             </div>
+            <EditorAssetList
+              editorAssets={editorAssets}
+              onSelect={async (asset) => {
+                setShowLoading(true);
+                await sceneRef.current!.loadModel(
+                  `http://localhost:3001/${asset.assetPath}`,
+                );
+                setShowLoading(false);
+              }}
+            />
             {(currentFloorIndex === null || showLoading) && (
               <div className="absolute left-0 top-0 flex h-[400px] w-[600px] cursor-not-allowed items-center justify-center bg-black opacity-80">
                 <LoadingIcon className="h-48 animate-spin" fill="white" />

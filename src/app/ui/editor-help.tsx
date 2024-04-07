@@ -35,7 +35,7 @@ export default function EditorHelp({ onClose }: { onClose: () => void }) {
               <span className="text-lg">
                 Press &#39;Shift&#39; + left click object
               </span>
-              <p className="pl-3 text-sm">Select a object</p>
+              <p className="pl-3 text-sm">Select an object</p>
             </li>
             <li className="mt-2">
               <span className="text-lg">
@@ -47,7 +47,7 @@ export default function EditorHelp({ onClose }: { onClose: () => void }) {
               <span className="text-lg">
                 Press &#39;Shift&#39; + left click selected object
               </span>
-              <p className="pl-3 text-sm">Unselect a object</p>
+              <p className="pl-3 text-sm">Unselect an object</p>
             </li>
             <li className="mt-2">
               <span className="text-lg">
