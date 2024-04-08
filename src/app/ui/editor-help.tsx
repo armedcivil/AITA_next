@@ -81,7 +81,7 @@ export default function EditorHelp({ onClose }: { onClose: () => void }) {
             <li className="mt-2">
               <span className="text-lg">
                 Press &#39;Control/Command/Windows&#39; +
-                &#39;Delete/Bacspace&#39;
+                &#39;Delete/Backspace&#39;
               </span>
               <p className="pl-3 text-sm">Delete selected objects</p>
             </li>
