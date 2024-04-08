@@ -24,9 +24,6 @@ export default function EditorAssetCell({
       {editorAsset.isChair && (
         <ChairIcon className="absolute right-0 top-0 h-5" fill="white" />
       )}
-      {!editorAsset.isDefault && (
-        <PencilIcon className="absolute bottom-0 right-0 h-5 text-white" />
-      )}
     </div>
   );
 }
