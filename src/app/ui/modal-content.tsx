@@ -14,7 +14,7 @@ export default function ModalContent({
       <div className="min-w-64 rounded-lg bg-white p-4 shadow-xl">
         <div className="flex w-full justify-end">
           <XMarkIcon
-            className="h-5"
+            className="h-5 cursor-pointer"
             onClick={() => {
               onClose?.();
             }}

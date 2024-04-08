@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { Floor } from './three/scene-store';
+import { EditorAsset } from '../ui/editor-asset-list';
 
 const apiHost = process.env.API_HOST;
 
@@ -325,6 +326,36 @@ export async function upsertFloors(
         .header('Authorization', `Bearer ${tokenCookie.value}`)
         .post();
       return { result: 'success' };
+    }
+    return { error: { message: 'Unauthorized' } };
+  } catch (e: any) {
+    return {
+      error: {
+        message: e.message.toString(),
+      },
+    };
+  }
+}
+
+export type CreateEditorAssetState = {
+  result?: EditorAsset;
+  error?: { message: string };
+};
+
+export async function createEditorAsset(
+  prevState: CreateEditorAssetState,
+  formData: FormData,
+): Promise<CreateEditorAssetState> {
+  try {
+    const tokenCookie = cookies().get('token');
+    if (tokenCookie) {
+      const response = await fetcha(`${apiHost}/company/editor-asset`)
+        .body(formData)
+        .header('Content-Type', 'multipart/form-data')
+        .header('Authorization', `Bearer ${tokenCookie.value}`)
+        .post();
+      const data = await response.toJson<EditorAsset>();
+      return { result: data };
     }
     return { error: { message: 'Unauthorized' } };
   } catch (e: any) {

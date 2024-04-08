@@ -23,11 +23,15 @@ export const restore = async (
 ): Promise<THREE.Object3D[]> => {
   return await Promise.all(
     sceneObjects.map(async (sceneObject) => {
-      const gltfModel = await loadGLTF(sceneObject.modelPath);
-      const originalScale = gltfModel.scale.clone();
-      gltfModel.applyMatrix4(sceneObject.matrix);
-      gltfModel.scale.set(originalScale.x, originalScale.y, originalScale.z);
-      return gltfModel;
+      try {
+        const gltfModel = await loadGLTF(sceneObject.modelPath);
+        const originalScale = gltfModel.scale.clone();
+        gltfModel.applyMatrix4(sceneObject.matrix);
+        gltfModel.scale.set(originalScale.x, originalScale.y, originalScale.z);
+        return gltfModel;
+      } catch (e) {
+        return new THREE.Object3D();
+      }
     }),
   );
 };

@@ -172,59 +172,6 @@ const Editor = (
               >
                 <ArrowPathIcon className="h-5" title="Reset camera position" />
               </button>
-              {/* <hr className="mt-2" /> */}
-              {/* <button
-                className="mt-2 flex justify-center"
-                onClick={async () => {
-                  setShowLoading(true);
-                  await sceneRef.current!.loadModel(
-                    'http://localhost:3001/models/chair.glb',
-                  );
-                  setShowLoading(false);
-                }}
-                title="Load 3D model of chair"
-              >
-                <ChairIcon className="h-5" fill="white" />
-              </button>
-              <button
-                className="mt-2 flex justify-center"
-                onClick={async () => {
-                  setShowLoading(true);
-                  await sceneRef.current!.loadModel(
-                    'http://localhost:3001/models/circle-desk.glb',
-                  );
-                  setShowLoading(false);
-                }}
-                title="Load 3D model of circle table"
-              >
-                <CircleTableIcon className="h-5" fill="white" />
-              </button>
-              <button
-                className="mt-2 flex justify-center"
-                onClick={async () => {
-                  setShowLoading(true);
-                  await sceneRef.current!.loadModel(
-                    'http://localhost:3001/models/square-desk.glb',
-                  );
-                  setShowLoading(false);
-                }}
-                title="Load 3D model of square table"
-              >
-                <SquareDeskIcon className="h-5" fill="white" />
-              </button>
-              <button
-                className="mt-2 flex justify-center"
-                onClick={async () => {
-                  setShowLoading(true);
-                  await sceneRef.current!.loadModel(
-                    'http://localhost:3001/models/scaled-square-desk.glb',
-                  );
-                  setShowLoading(false);
-                }}
-                title="Load 3D model of square table"
-              >
-                <ScaledSquareDeskIcon className="h-5" fill="white" />
-              </button> */}
             </div>
             <EditorAssetList
               editorAssets={editorAssets}

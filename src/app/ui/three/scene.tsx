@@ -101,7 +101,7 @@ const Scene = (
   useEffect(() => {
     const canvas = renderer.domElement;
     const handler = (e: any) => {
-      e.preventDefault();
+      // e.preventDefault();
       THREE.Cache.clear();
       renderer.forceContextRestore();
     };

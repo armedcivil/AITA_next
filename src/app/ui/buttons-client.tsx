@@ -46,3 +46,18 @@ export function UploadFloorButton() {
     </Button>
   );
 }
+
+export function CreateEditorAssetButton() {
+  const { pending } = useFormStatus();
+  return (
+    <Button
+      className="col-start-6 col-end-7 row-start-4 justify-self-end"
+      disabled={pending}
+    >
+      Create{' '}
+      {pending && (
+        <LoadingIcon className="h-5 animate-spin md:ml-4" fill="white" />
+      )}
+    </Button>
+  );
+}
