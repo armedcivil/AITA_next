@@ -6,6 +6,7 @@ import clsx from 'clsx';
 import List from './list';
 
 export type EditorAsset = {
+  id?: number;
   assetPath: string;
   thumbnailPath: string;
   isChair: boolean;

@@ -14,9 +14,11 @@ import { EditorAsset } from './editor-asset-list';
 export default function CreateEditorAssetForm({
   onCreate,
   redirectUrl,
+  handleRevalidate,
 }: {
   onCreate?: (editorAsset: EditorAsset) => void;
   redirectUrl?: string;
+  handleRevalidate?: () => void;
 }) {
   const thumbnailInput = useRef<HTMLInputElement>(null);
   const [formState, formDispatch] = useFormState(createEditorAsset, {
@@ -28,11 +30,12 @@ export default function CreateEditorAssetForm({
     if (formState.result) {
       setImageSrc('');
       onCreate?.(formState.result);
+      handleRevalidate?.();
       if (redirectUrl) {
         redirect(redirectUrl);
       }
     }
-  }, [formState.result, onCreate, setImageSrc, redirectUrl]);
+  }, [formState.result, onCreate, setImageSrc, redirectUrl, handleRevalidate]);
 
   const capture = async (assetPath: string) => {
     const gltfModel = await loadGLTF(assetPath);

@@ -61,3 +61,17 @@ export function CreateEditorAssetButton() {
     </Button>
   );
 }
+
+export function DeleteEditorAssetButton() {
+  const { pending } = useFormStatus();
+  return (
+    <Button disabled={pending}>
+      Delete
+      {pending ? (
+        <LoadingIcon className="h-5 animate-spin md:ml-4" fill="white" />
+      ) : (
+        <TrashIcon className="h-5"></TrashIcon>
+      )}
+    </Button>
+  );
+}

@@ -355,9 +355,43 @@ export async function createEditorAsset(
         .header('Authorization', `Bearer ${tokenCookie.value}`)
         .post();
       const data = await response.toJson<EditorAsset>();
+
       return { result: data };
     }
     return { error: { message: 'Unauthorized' } };
+  } catch (e: any) {
+    return {
+      error: {
+        message: e.message.toString(),
+      },
+    };
+  }
+}
+
+export type DeleteEditorAssetState = {
+  error?: {
+    message: string;
+  };
+  result?: string;
+};
+
+export async function deleteEditorAsset(
+  id: string,
+  prevState: DeleteEditorAssetState,
+  formData: FormData,
+): Promise<DeleteEditorAssetState> {
+  try {
+    const tokenCookie = cookies().get('token');
+    if (tokenCookie) {
+      const response = await fetcha(`${apiHost}/company/editor-asset/${id}`)
+        .header('Authorization', `Bearer ${tokenCookie.value}`)
+        .delete();
+
+      revalidatePath('/company/assets');
+
+      return await response.toJson<{ result: string }>();
+    }
+    return { result: 'failure' };
   } catch (e: any) {
     return {
       error: {

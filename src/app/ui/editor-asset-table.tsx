@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { EditorAsset } from './editor-asset-list';
 import { CheckIcon } from '@heroicons/react/24/outline';
+import DeleteEditorAssetModalButton from './delete-editor-asset-modal-button';
 
 export default function EditorAssetTable({
   page,
@@ -42,7 +43,11 @@ export default function EditorAssetTable({
                 </div>
               </td>
               <td className="px-4 py-[4px]">
-                <div className="flex items-center justify-center"></div>
+                <div className="flex items-center justify-center">
+                  {!value.isDefault && (
+                    <DeleteEditorAssetModalButton editorAsset={value} />
+                  )}
+                </div>
               </td>
             </tr>
           );
