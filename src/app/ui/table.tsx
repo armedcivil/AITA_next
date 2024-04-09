@@ -4,8 +4,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { PencilIcon } from '@heroicons/react/24/outline';
 import { fetchUsers } from '../lib/data';
-import { DeleteUserButton } from './buttons-client';
 import { cookies } from 'next/headers';
+import DeleteUserModalButton from './delete-user-modal-button';
 
 export default async function Table({
   companyId,
@@ -19,7 +19,7 @@ export default async function Table({
   const accessToken = cookies().get('token')!.value;
   const users = await fetchUsers(companyId, page, query);
   return (
-    <table className="h-[200px] w-[600px]">
+    <table className="w-[600px]">
       <thead className="sticky z-20">
         <tr className="text-center">
           <th>ICON</th>
@@ -54,11 +54,11 @@ export default async function Table({
                 <div className="flex items-center justify-center">
                   <Link
                     href={`/company/users/${user.id}/edit`}
-                    className="inline-block h-4 w-4"
+                    className="inline-block h-5 w-5"
                   >
-                    <PencilIcon className="h-4 w-4" />
+                    <PencilIcon className="h-5 cursor-pointer text-red-400" />
                   </Link>
-                  <DeleteUserButton
+                  <DeleteUserModalButton
                     accessToken={accessToken}
                     userId={user.id.toString()}
                   />

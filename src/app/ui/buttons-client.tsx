@@ -5,31 +5,22 @@ import {
   DocumentArrowUpIcon,
   ArrowPathIcon,
 } from '@heroicons/react/24/outline';
-import { deleteUser } from '../lib/actions';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useFormStatus } from 'react-dom';
 import { Button } from '@/app/ui/button';
 import LoadingIcon from './icons/loading-icon';
 
-// TODO: モーダル出して削除前に確認
-export function DeleteUserButton({
-  accessToken,
-  userId,
-}: {
-  accessToken: string;
-  userId: string;
-}) {
-  const deleteUserWithParams = deleteUser.bind(null, accessToken, userId);
-  const initialState = { error: { message: '' } };
-  const [state, dispatch] = useFormState(deleteUserWithParams, initialState);
+export function DeleteUserButton() {
+  const { pending } = useFormStatus();
 
   return (
-    <div>
-      <form action={dispatch}>
-        <button className="ml-4 block h-4 w-4">
-          <TrashIcon className="h-4 w-4" />
-        </button>
-      </form>
-    </div>
+    <Button className="ml-4">
+      Delete
+      {pending ? (
+        <LoadingIcon className="h-5 animate-spin md:ml-4" fill="white" />
+      ) : (
+        <TrashIcon className="h-5 text-white" />
+      )}
+    </Button>
   );
 }
 
