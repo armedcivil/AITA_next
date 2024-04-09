@@ -48,6 +48,16 @@ export default function TopNav() {
           Editor
         </Link>
       </div>
+      <div className="flex h-full items-center  justify-self-start px-6">
+        <Link
+          href={'/company/assets'}
+          className={clsx('', {
+            'text-red-400': pathname.startsWith('/company/assets'),
+          })}
+        >
+          Assets
+        </Link>
+      </div>
       <div className="ml-auto flex h-full items-center justify-self-end px-6">
         <Link
           href={'/logout'}

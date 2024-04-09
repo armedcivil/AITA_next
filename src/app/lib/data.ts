@@ -105,12 +105,32 @@ export async function fetchFloors(
   }
 }
 
-export async function fetchEditorAssets(accessToken: string): Promise<{
+export async function fetchEditorAssets(
+  accessToken: string,
+  page?: string,
+  order?: 'asc' | 'desc',
+): Promise<{
   editorAssets?: EditorAsset[];
+  pager?: {
+    total: number;
+    maxPage: number;
+    hasPrevious: boolean;
+    hasNext: boolean;
+    current: number;
+  };
   error?: { message: string };
 }> {
   try {
-    const response = await fetcha(`${apiHost}/company/editor-asset`)
+    const params = new URLSearchParams();
+    if (page) {
+      params.set('page', page);
+    }
+    if (order) {
+      params.set('order', order);
+    }
+    const response = await fetcha(
+      `${apiHost}/company/editor-asset?${params.toString()}`,
+    )
       .header('Authorization', `Bearer ${accessToken}`)
       .get();
 
