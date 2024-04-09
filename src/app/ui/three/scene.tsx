@@ -137,7 +137,7 @@ const Scene = (
           onChange?.(toJSON());
         }
         if (e.key === 'Delete' || e.key === 'Backspace') {
-          // TODO: e.preventDefault()
+          e.preventDefault();
           removeSelected();
           onChange?.(toJSON());
         }
