@@ -21,7 +21,6 @@ export default async function Page() {
     }
   }
 
-  // TODO: カスタムなモデルの読み込み機能
   return (
     <div className="h-full p-3">
       <Editor defaultFloors={floors} editorAssets={editorAssets} />
