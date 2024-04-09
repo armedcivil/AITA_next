@@ -23,7 +23,7 @@ import {
 export interface SceneMethod {
   resetCamera: () => void;
   restore: (json: Floor) => void;
-  loadModel: (path: string) => void;
+  loadModel: (path: string, isChair: boolean) => void;
 }
 
 // Scene コンポーネント
@@ -89,9 +89,8 @@ const Scene = (
         selectRef.current?.attach(object);
       });
     },
-    // TODO: 机・椅子の区別が付けられるように userData に type プロパティをつける
-    async loadModel(path: string) {
-      const gltfModel = await loadGLTF(path);
+    async loadModel(path: string, isChair: boolean) {
+      const gltfModel = await loadGLTF(path, isChair);
       selectRef.current?.attach(gltfModel);
       onChange?.(toJSON());
     },

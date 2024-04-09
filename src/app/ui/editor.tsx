@@ -179,6 +179,7 @@ const Editor = (
                 setShowLoading(true);
                 await sceneRef.current!.loadModel(
                   `http://localhost:3001/${asset.assetPath}`,
+                  asset.isChair,
                 );
                 setShowLoading(false);
               }}
