@@ -47,7 +47,7 @@ export const restore = async (
 
 export const loadGLTF = async (
   path: string,
-  isChair: boolean,
+  isChair?: boolean,
   id?: string,
 ): Promise<THREE.Object3D> => {
   const loader = new GLTFLoader();

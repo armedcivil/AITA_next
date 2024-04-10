@@ -21,6 +21,7 @@ export default function CreateEditorAssetForm({
   handleRevalidate?: () => void;
 }) {
   const thumbnailInput = useRef<HTMLInputElement>(null);
+  const topImageInput = useRef<HTMLInputElement>(null);
   const [formState, formDispatch] = useFormState(createEditorAsset, {
     error: { message: '' },
   });
@@ -37,7 +38,10 @@ export default function CreateEditorAssetForm({
     }
   }, [formState.result, onCreate, setImageSrc, redirectUrl, handleRevalidate]);
 
-  const capture = async (assetPath: string) => {
+  const capture = async (
+    assetPath: string,
+    position: THREE.Vector3 = new THREE.Vector3(-5, 5, 5),
+  ) => {
     const gltfModel = await loadGLTF(assetPath);
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
@@ -50,7 +54,7 @@ export default function CreateEditorAssetForm({
     scene.add(gltfModel);
     scene.add(light);
 
-    camera.position.set(-5, 5, 5);
+    camera.position.set(position.x, position.y, position.z);
     camera.lookAt(0, 0, 0);
 
     light.position.set(0, 5, 0);
@@ -80,8 +84,7 @@ export default function CreateEditorAssetForm({
       });
     });
 
-    thumbnailInput.current!.value = dataURL;
-    setImageSrc(dataURL);
+    return dataURL;
   };
 
   return (
@@ -102,6 +105,7 @@ export default function CreateEditorAssetForm({
           )}
         </div>
         <input type="hidden" name="thumbnail" ref={thumbnailInput} />
+        <input type="hidden" name="topImage" ref={topImageInput} />
         <label
           htmlFor="asset"
           className="relative col-start-4 col-end-7 row-start-1 row-end-3 flex items-center justify-center rounded-lg border-2 border-red-400"
@@ -118,11 +122,20 @@ export default function CreateEditorAssetForm({
             name="asset"
             className="absolute h-full w-full opacity-0"
             accept=".glb"
-            onChange={(e) => {
+            onChange={async (e) => {
               if (e.target.files?.length === 0) {
                 setImageSrc('');
               } else {
-                capture(URL.createObjectURL(e.target.files![0]));
+                const dataURL = await capture(
+                  URL.createObjectURL(e.target.files![0]),
+                );
+                thumbnailInput.current!.value = dataURL;
+                setImageSrc(dataURL);
+                const topImageDataURL = await capture(
+                  URL.createObjectURL(e.target.files![0]),
+                  new THREE.Vector3(0, 5, 0),
+                );
+                topImageInput.current!.value = topImageDataURL;
               }
             }}
           />
