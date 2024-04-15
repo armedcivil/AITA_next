@@ -88,13 +88,20 @@ export async function fetchUser(accessToken: string, userId: string) {
 
 export async function fetchFloors(
   accessToken: string,
-): Promise<{ floors?: Floor[]; error?: { message: string } }> {
+): Promise<{
+  floors?: Floor[];
+  error?: { message: string };
+  viewerKey?: string;
+}> {
   try {
     const response = await fetcha(`${apiHost}/company/floor`)
       .header('Authorization', `Bearer ${accessToken}`)
       .get();
 
-    const data = await response.toJson<{ floors: Floor[] }>();
+    const data = await response.toJson<{
+      floors: Floor[];
+      viewerKey: string;
+    }>();
     return data;
   } catch (e: any) {
     return {

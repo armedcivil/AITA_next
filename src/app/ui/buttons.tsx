@@ -1,5 +1,8 @@
 import Link from 'next/link';
-import { PlusIcon } from '@heroicons/react/24/outline';
+import {
+  PlusIcon,
+  ArrowTopRightOnSquareIcon,
+} from '@heroicons/react/24/outline';
 import { Button } from '@/app/ui/button';
 import clsx from 'clsx';
 
@@ -70,7 +73,11 @@ export function HomeButton({
   );
 }
 
-export function EditorAssetCreateButton({ className }: { className?: string | null }) {
+export function EditorAssetCreateButton({
+  className,
+}: {
+  className?: string | null;
+}) {
   return (
     <Link
       href="/company/assets/create"
@@ -82,5 +89,27 @@ export function EditorAssetCreateButton({ className }: { className?: string | nu
       <span className="hidden md:block">Create</span>{' '}
       <PlusIcon className="h-5 md:ml-4" />
     </Link>
+  );
+}
+
+export function ViewerButton({
+  className,
+  viewerKey,
+}: {
+  className?: string;
+  viewerKey: string;
+}) {
+  return (
+    <a
+      href={`http://localhost:17000/?key=${viewerKey}`}
+      target="_blank"
+      className={clsx(
+        'flex h-10 items-center rounded-lg bg-red-400 px-4 text-sm font-medium text-white transition-colors hover:bg-red-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 active:bg-red-600 aria-disabled:cursor-not-allowed aria-disabled:opacity-50',
+        className,
+      )}
+    >
+      <span className="hidden md:block">View</span>{' '}
+      <ArrowTopRightOnSquareIcon className="h-5 md:ml-4" />
+    </a>
   );
 }

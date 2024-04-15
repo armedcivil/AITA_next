@@ -9,10 +9,14 @@ export default async function Page() {
   const tokenCookie = cookies().get('token');
   let floors: Floor[] = [];
   let editorAssets: EditorAsset[] = [];
+  let viewerKey: string = '';
   if (tokenCookie) {
     const data = await fetchFloors(tokenCookie.value);
     if (data.floors) {
       floors = data.floors;
+    }
+    if (data.viewerKey) {
+      viewerKey = data.viewerKey;
     }
 
     const assets = await fetchEditorAssets(tokenCookie.value);
@@ -23,7 +27,11 @@ export default async function Page() {
 
   return (
     <div className="h-full p-3">
-      <Editor defaultFloors={floors} editorAssets={editorAssets} />
+      <Editor
+        defaultFloors={floors}
+        editorAssets={editorAssets}
+        viewerKey={viewerKey}
+      />
     </div>
   );
 }

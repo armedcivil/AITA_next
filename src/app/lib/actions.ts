@@ -309,6 +309,7 @@ export async function updateCompanyProfile(
 
 export type UpsertFloorState = {
   result?: string;
+  viewerKey?: string;
   error?: { message: string };
 };
 
@@ -320,12 +321,13 @@ export async function upsertFloors(
     const formFloors = formData.get('floors');
     const tokenCookie = cookies().get('token');
     if (tokenCookie && formFloors) {
-      await fetcha(`${apiHost}/company/floor`)
+      const response = await fetcha(`${apiHost}/company/floor`)
         .body({ floors: JSON.parse(formFloors.toString()) })
         .header('Content-Type', 'application/json')
         .header('Authorization', `Bearer ${tokenCookie.value}`)
         .post();
-      return { result: 'success' };
+      const data = await response.toJson<{ viewerKey: string }>();
+      return { result: 'success', viewerKey: data.viewerKey };
     }
     return { error: { message: 'Unauthorized' } };
   } catch (e: any) {

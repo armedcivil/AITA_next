@@ -20,6 +20,7 @@ import { upsertFloors } from '../lib/actions';
 import { UploadFloorButton } from '@/app/ui/buttons-client';
 import LoadingIcon from './icons/loading-icon';
 import EditorAssetList, { EditorAsset } from './editor-asset-list';
+import { ViewerButton } from './buttons';
 
 interface DeleteAction {
   action: 'delete';
@@ -43,7 +44,12 @@ const Editor = (
   {
     defaultFloors,
     editorAssets,
-  }: { defaultFloors: Floor[]; editorAssets: EditorAsset[] },
+    viewerKey,
+  }: {
+    defaultFloors: Floor[];
+    editorAssets: EditorAsset[];
+    viewerKey?: string;
+  },
   ref: any,
 ) => {
   const [isEditMode, setEditMode] = useState(true);
@@ -73,6 +79,7 @@ const Editor = (
   );
   const [state, formDispatch] = useFormState(upsertFloors, {
     error: { message: '' },
+    viewerKey,
   });
   const [showLoading, setShowLoading] = useState(false);
 
@@ -104,6 +111,9 @@ const Editor = (
           <input type="hidden" name="floors" value={JSON.stringify(floors)} />
           <UploadFloorButton />
         </form>
+        {state.viewerKey && (
+          <ViewerButton className="ml-4" viewerKey={state.viewerKey} />
+        )}
         <QuestionMarkCircleIcon
           className="ml-4 h-5 text-red-400 hover:text-red-200"
           onClick={() => {
