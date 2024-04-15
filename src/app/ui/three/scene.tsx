@@ -250,17 +250,6 @@ const Scene = (
     });
   };
 
-  // オブジェクトの複製処理
-  const clone = (selectedObjects: THREE.Object3D[] | undefined) => {
-    if (!selectedObjects) {
-      return;
-    }
-    const clonedObjects = cloneObjects(selectedObjects);
-    attachObjectsToSelectGroup([]);
-    clonedObjects.forEach((object) => selectedGroup.current?.attach(object));
-    onChange?.(toJSON());
-  };
-
   // コンポーネントが返す JSX
   return (
     <>
