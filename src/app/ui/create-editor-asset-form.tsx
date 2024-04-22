@@ -41,6 +41,7 @@ export default function CreateEditorAssetForm({
   const capture = async (
     assetPath: string,
     position: THREE.Vector3 = new THREE.Vector3(-5, 5, 5),
+    isTop?: boolean,
   ) => {
     const gltfModel = await loadGLTF(assetPath);
     const scene = new THREE.Scene();
@@ -48,8 +49,6 @@ export default function CreateEditorAssetForm({
     const light = new THREE.DirectionalLight('white');
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     const boundingBox = new THREE.Box3();
-
-    renderer.setSize(80, 80);
 
     scene.add(gltfModel);
     scene.add(light);
@@ -60,10 +59,18 @@ export default function CreateEditorAssetForm({
     light.position.set(0, 5, 0);
     light.lookAt(0, 0, 0);
 
+    const defaultDistance = camera.position.distanceTo(gltfModel.position);
+
     const fitter = new CameraFitter(camera);
     boundingBox.setFromObject(gltfModel);
     fitter.targetBox = boundingBox;
     fitter.fitCamera();
+
+    const distance = camera.position.distanceTo(gltfModel.position);
+
+    const size = isTop ? 150 * (distance / defaultDistance) : 150;
+
+    renderer.setSize(size, size);
 
     renderer.render(scene, camera);
     const dataURL = await new Promise<string>((resolve, reject) => {
@@ -134,6 +141,7 @@ export default function CreateEditorAssetForm({
                 const topImageDataURL = await capture(
                   URL.createObjectURL(e.target.files![0]),
                   new THREE.Vector3(0, 5, 0),
+                  true,
                 );
                 topImageInput.current!.value = topImageDataURL;
               }
