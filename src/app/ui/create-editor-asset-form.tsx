@@ -38,11 +38,7 @@ export default function CreateEditorAssetForm({
     }
   }, [formState.result, onCreate, setImageSrc, redirectUrl, handleRevalidate]);
 
-  const capture = async (
-    assetPath: string,
-    position: THREE.Vector3 = new THREE.Vector3(-5, 5, 5),
-    isTop?: boolean,
-  ) => {
+  const captureThumbnail = async (assetPath: string) => {
     const gltfModel = await loadGLTF(assetPath);
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
@@ -53,27 +49,63 @@ export default function CreateEditorAssetForm({
     scene.add(gltfModel);
     scene.add(light);
 
-    camera.position.set(position.x, position.y, position.z);
+    camera.position.set(-5, 5, 5);
     camera.lookAt(0, 0, 0);
 
     light.position.set(0, 5, 0);
     light.lookAt(0, 0, 0);
-
-    const defaultDistance = camera.position.distanceTo(gltfModel.position);
 
     const fitter = new CameraFitter(camera);
     boundingBox.setFromObject(gltfModel);
     fitter.targetBox = boundingBox;
     fitter.fitCamera();
 
-    const distance = camera.position.distanceTo(gltfModel.position);
-
-    const size = isTop ? 150 * (distance / defaultDistance) : 150;
+    const size = 150;
 
     renderer.setSize(size, size);
 
     renderer.render(scene, camera);
-    const dataURL = await new Promise<string>((resolve, reject) => {
+    return await exportImage(renderer);
+  };
+
+  const captureTop = async (assetPath: string) => {
+    const gltfModel = await loadGLTF(assetPath);
+    const scene = new THREE.Scene();
+    const camera = new THREE.OrthographicCamera();
+    const light = new THREE.DirectionalLight('white');
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    const boundingBox = new THREE.Box3();
+
+    scene.add(gltfModel);
+    scene.add(light);
+
+    camera.position.set(0, 5, 0);
+    camera.lookAt(0, 0, 0);
+
+    light.position.set(0, 5, 0);
+    light.lookAt(0, 0, 0);
+
+    boundingBox.setFromObject(gltfModel);
+    camera.left = boundingBox.min.x;
+    camera.right = boundingBox.max.x;
+    camera.top = boundingBox.max.z;
+    camera.bottom = boundingBox.min.z;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize(
+      250 * (boundingBox.max.x - boundingBox.min.x),
+      250 * (boundingBox.max.z - boundingBox.min.z),
+    );
+
+    renderer.render(scene, camera);
+
+    return await exportImage(renderer);
+  };
+
+  const exportImage = async (
+    renderer: THREE.WebGLRenderer,
+  ): Promise<string> => {
+    return await new Promise<string>((resolve, reject) => {
       renderer.domElement.toBlob((blob) => {
         if (blob) {
           const reader = new FileReader();
@@ -86,12 +118,10 @@ export default function CreateEditorAssetForm({
             }
           };
         } else {
-          reject("can't read");
+          reject("can't extract blob");
         }
       });
     });
-
-    return dataURL;
   };
 
   return (
@@ -133,15 +163,13 @@ export default function CreateEditorAssetForm({
               if (e.target.files?.length === 0) {
                 setImageSrc('');
               } else {
-                const dataURL = await capture(
+                const dataURL = await captureThumbnail(
                   URL.createObjectURL(e.target.files![0]),
                 );
                 thumbnailInput.current!.value = dataURL;
                 setImageSrc(dataURL);
-                const topImageDataURL = await capture(
+                const topImageDataURL = await captureTop(
                   URL.createObjectURL(e.target.files![0]),
-                  new THREE.Vector3(0, 5, 0),
-                  true,
                 );
                 topImageInput.current!.value = topImageDataURL;
               }
