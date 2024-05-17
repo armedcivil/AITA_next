@@ -7,7 +7,9 @@ import { useFormState, useFormStatus } from 'react-dom';
 import { signIn } from '../lib/actions';
 
 export default function LoginForm() {
-  const initialState = { error: { message: '' } };
+  const initialState = {
+    error: { message: '', email: undefined, password: undefined },
+  };
   const [state, dispatch] = useFormState(signIn, initialState);
 
   return (
@@ -39,6 +41,13 @@ export default function LoginForm() {
             placeholder="user@example.com"
             className="h-8 w-full rounded-lg border-2 border-red-400 p-2"
           />
+          {state?.error?.email && (
+            <ul className="text-right text-xs text-red-600">
+              {state?.error?.email.map((error, index) => {
+                return <li key={index}>*{error}</li>;
+              })}
+            </ul>
+          )}
           <label
             className="mb-2 mt-4 block self-start text-xs font-medium text-gray-900"
             htmlFor="password"
@@ -52,6 +61,13 @@ export default function LoginForm() {
             placeholder="12345678"
             className="h-8 w-full rounded-lg border-2 border-red-400 p-2"
           />
+          {state?.error?.password && (
+            <ul className="text-right text-xs text-red-600">
+              {state?.error?.password.map((error, index) => {
+                return <li key={index}>*{error}</li>;
+              })}
+            </ul>
+          )}
           <LoginButton />
         </div>
       </form>

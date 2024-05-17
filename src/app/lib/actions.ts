@@ -4,14 +4,15 @@ import { fetcha, FetchaError } from '@co-labo-hub/fetcha';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { Floor } from './three/scene-store';
 import { EditorAsset } from '../ui/editor-asset-list';
 
 const apiHost = process.env.API_HOST;
 
 export type SignInState = {
   error?: {
-    message: string;
+    message?: string;
+    email?: string[];
+    password?: string[];
   };
   accessToken?: string;
 };
@@ -30,9 +31,15 @@ export async function signIn(prevState: SignInState, formData: FormData) {
 
     cookies().set('token', accessToken);
   } catch (e: any) {
+    let errors: { email?: string[]; password?: string[] } = {};
+    if (e.response && e.response.body) {
+      errors = JSON.parse(await new Response(e.response.body).text()).errors
+    }
     return {
       error: {
         message: e.message,
+        email: errors.email,
+        password: errors.password,
       },
     };
   }
