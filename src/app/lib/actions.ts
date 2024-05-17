@@ -5,7 +5,6 @@ import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { EditorAsset } from '../ui/editor-asset-list';
-
 const apiHost = process.env.API_HOST;
 
 export type SignInState = {
@@ -17,7 +16,10 @@ export type SignInState = {
   accessToken?: string;
 };
 
-export async function signIn(prevState: SignInState, formData: FormData) {
+export async function signIn(
+  prevState: SignInState,
+  formData: FormData,
+): Promise<SignInState> {
   try {
     const response = await fetcha(`${apiHost}/auth/company/login`)
       .contentType('application/json')
@@ -30,10 +32,11 @@ export async function signIn(prevState: SignInState, formData: FormData) {
     const { accessToken } = await response.toJson<{ accessToken: string }>();
 
     cookies().set('token', accessToken);
+    return { accessToken };
   } catch (e: any) {
     let errors: { email?: string[]; password?: string[] } = {};
     if (e.response && e.response.body) {
-      errors = JSON.parse(await new Response(e.response.body).text()).errors
+      errors = JSON.parse(await new Response(e.response.body).text()).errors;
     }
     return {
       error: {
@@ -43,7 +46,6 @@ export async function signIn(prevState: SignInState, formData: FormData) {
       },
     };
   }
-  redirect('/company/users');
 }
 
 export async function checkAuth(

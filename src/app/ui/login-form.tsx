@@ -3,14 +3,33 @@
 import Image from 'next/image';
 import { ArrowRightIcon } from '@heroicons/react/24/solid';
 import { Button } from './button';
+import { useEffect } from 'react';
+import { redirect } from 'next/navigation';
 import { useFormState, useFormStatus } from 'react-dom';
 import { signIn } from '../lib/actions';
+import { showDangerAlert, showSuccessAlert } from '../ui/alert';
 
 export default function LoginForm() {
   const initialState = {
     error: { message: '', email: undefined, password: undefined },
   };
   const [state, dispatch] = useFormState(signIn, initialState);
+
+  useEffect(() => {
+    if (
+      state.error &&
+      (state.error.message ||
+        state.error.message !== '' ||
+        state.error.email ||
+        state.error.password)
+    ) {
+      showDangerAlert('Logged in failed');
+    } else if (state.accessToken) {
+      showSuccessAlert('Logged in successfully');
+      redirect('/company/users');
+    }
+    return () => {};
+  }, [state]);
 
   return (
     <div className={`h-4/5 w-1/2 bg-white`}>
