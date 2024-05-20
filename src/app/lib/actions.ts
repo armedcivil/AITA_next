@@ -259,7 +259,9 @@ export async function fetchCompanyProfile(): Promise<{
 
 export type UpdateCompanyState = {
   error?: {
-    message: string;
+    message?: string;
+    email?: string[];
+    password?: string[];
   };
   result?: string;
 };
@@ -267,10 +269,7 @@ export type UpdateCompanyState = {
 export async function updateCompanyProfile(
   prevState: UpdateCompanyState,
   formData: FormData,
-): Promise<{
-  error?: { message: string };
-  result?: string;
-}> {
+): Promise<UpdateCompanyState> {
   try {
     const requestBody: {
       id: number;
@@ -308,9 +307,15 @@ export async function updateCompanyProfile(
       },
     };
   } catch (e: any) {
+    let errors: { email?: string[]; password?: string[] } = {};
+    if (e.response && e.response.body) {
+      errors = JSON.parse(await new Response(e.response.body).text()).errors;
+    }
     return {
       error: {
         message: e.message.toString(),
+        email: errors.email,
+        password: errors.password,
       },
     };
   }

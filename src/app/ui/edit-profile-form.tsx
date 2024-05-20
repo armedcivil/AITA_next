@@ -3,6 +3,8 @@
 import { updateCompanyProfile } from '../lib/actions';
 import { Button } from './button';
 import { useFormState } from 'react-dom';
+import { useEffect } from 'react';
+import { showSuccessAlert, showDangerAlert } from './alert';
 
 export default function EditProfileForm({
   companyProfile,
@@ -12,12 +14,19 @@ export default function EditProfileForm({
   const initialState = { error: { message: '' } };
   const [state, dispatch] = useFormState(updateCompanyProfile, initialState);
 
+  useEffect(() => {
+    if (state.result && state.result === 'success') {
+      showSuccessAlert('Update company profile successfully');
+    } else {
+      showDangerAlert('Update company profile failed');
+    }
+
+    return () => {};
+  }, [state]);
+
   return (
     <>
-      {state.result && state.result === 'success' && <div>success</div>}
-      {state.result && state.result === 'failed' && <div>failed</div>}
-      {state.error !== undefined && <div>{state.error.message}</div>}
-      <form action={dispatch} className="grid w-full grid-cols-6 grid-rows-7">
+      <form action={dispatch} className="grid-rows-max grid w-full grid-cols-6">
         <input type="hidden" name="id" value={companyProfile.id?.toString()} />
         <label className="col-end-3 mr-4 self-center justify-self-end">
           Name
@@ -31,20 +40,38 @@ export default function EditProfileForm({
         <label className="col-end-3 mr-4 self-center justify-self-end">
           Email
         </label>
-        <input
-          type="text"
-          name="email"
-          className="col-start-3 col-end-7 my-2 h-10 self-center rounded-lg border-2 border-red-400 p-2"
-          defaultValue={companyProfile.email}
-        ></input>
+        <span className="col-start-3 col-end-7 my-2">
+          <input
+            type="text"
+            name="email"
+            className="h-10 w-full self-center rounded-lg border-2 border-red-400 p-2"
+            defaultValue={companyProfile.email}
+          ></input>
+          {state.error?.email && (
+            <ul className="text-right text-xs text-red-600">
+              {state.error?.email?.map((error, index) => {
+                return <li key={index}>{error}</li>;
+              })}
+            </ul>
+          )}
+        </span>
         <label className="col-end-3 mr-4 self-center justify-self-end">
           Password
         </label>
-        <input
-          type="password"
-          name="password"
-          className="col-start-3 col-end-7 my-2 h-10 self-center rounded-lg border-2 border-red-400 p-2"
-        ></input>
+        <span className="col-start-3 col-end-7 my-2">
+          <input
+            type="password"
+            name="password"
+            className=" h-10 w-full self-center rounded-lg border-2 border-red-400 p-2"
+          ></input>
+          {state.error?.password && (
+            <ul className="text-right text-xs text-red-600">
+              {state.error?.password?.map((error, index) => {
+                return <li key={index}>{error}</li>;
+              })}
+            </ul>
+          )}
+        </span>
         <label className="col-end-3 mr-4 self-center justify-self-end">
           Confirm
         </label>
