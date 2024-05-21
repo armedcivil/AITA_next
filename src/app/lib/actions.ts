@@ -76,6 +76,10 @@ export type CreateUserState =
   | {
       error?: {
         message?: string;
+        name?: string[];
+        email?: string[];
+        password?: string[];
+        passwordConfirmation?: string[];
       };
     }
   | undefined;
@@ -85,7 +89,7 @@ class UnauthorizedError extends Error {}
 export async function createUser(
   prevState: CreateUserState,
   formData: FormData,
-) {
+): Promise<CreateUserState> {
   try {
     const tokenCookie = cookies().get('token');
     if (tokenCookie) {
@@ -103,21 +107,32 @@ export async function createUser(
     }
 
     let message = e.message.toString();
+    let name,
+      email,
+      password,
+      passwordConfirmation = undefined;
     if (e instanceof FetchaError) {
       if (e.response && e.response.body) {
-        message = JSON.parse(
+        const responseBody = JSON.parse(
           await new Response(e.response.body).text(),
-        ).message;
+        );
+        message = responseBody.message;
+        name = responseBody.errors.name;
+        email = responseBody.errors.email;
+        password = responseBody.errors.password;
+        passwordConfirmation = responseBody.errors.passwordConfirmation;
       }
     }
     return {
       error: {
         message: message,
+        name,
+        email,
+        password,
+        passwordConfirmation,
       },
     };
   }
-
-  redirect('/company/users');
 }
 
 export type UpdateUserState =
