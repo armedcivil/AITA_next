@@ -6,6 +6,8 @@ import { useFormState, createPortal } from 'react-dom';
 import ModalContent from './modal-content';
 import { DeleteUserButton } from './buttons-client';
 import { deleteUser } from '../lib/actions';
+import { showDangerAlert, showSuccessAlert } from '../ui/alert';
+import { redirect } from 'next/navigation';
 
 export default function DeleteUserModalButton({
   accessToken,
@@ -22,7 +24,13 @@ export default function DeleteUserModalButton({
 
   useEffect(() => {
     setShowModal(false);
-  }, [setShowModal]);
+    if (state.result === 'success') {
+      showSuccessAlert('Delete user successfully');
+      redirect('/company/users');
+    } else if (state.result === 'failed') {
+      showDangerAlert('Delete user failed');
+    }
+  }, [setShowModal, state]);
   return (
     <>
       <TrashIcon

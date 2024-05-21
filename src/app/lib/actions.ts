@@ -226,13 +226,11 @@ export async function deleteUser(
   userId: string,
   prevState: DeleteUserState,
   formData: FormData,
-) {
+): Promise<DeleteUserState> {
   try {
     const response = await fetcha(`${apiHost}/user/${userId}`)
       .header('Authorization', `Bearer ${accessToken}`)
       .delete();
-
-    revalidatePath('/company/users');
 
     return await response.toJson<{ result: string }>();
   } catch (e: any) {
