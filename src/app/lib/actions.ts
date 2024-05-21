@@ -139,6 +139,8 @@ export type UpdateUserState =
   | {
       error?: {
         message?: string;
+        email?: string[];
+        password?: string[];
       };
     }
   | undefined;
@@ -147,7 +149,7 @@ export async function updateUser(
   id: string,
   prevState: UpdateUserState,
   formData: FormData,
-) {
+): Promise<UpdateUserState> {
   const deleteKeys: string[] = [];
   formData.forEach((value, key, parent) => {
     if (
@@ -190,21 +192,26 @@ export async function updateUser(
     }
 
     let message = e.message.toString();
+    let email = undefined;
+    let password = undefined;
     if (e instanceof FetchaError) {
       if (e.response && e.response.body) {
-        message = JSON.parse(
+        const responseBody = JSON.parse(
           await new Response(e.response.body).text(),
-        ).message;
+        );
+        message = responseBody.message;
+        email = responseBody.errors.email;
+        password = responseBody.errors.password;
       }
     }
     return {
       error: {
         message: message,
+        email,
+        password,
       },
     };
   }
-
-  redirect('/company/users');
 }
 
 export type DeleteUserState = {
